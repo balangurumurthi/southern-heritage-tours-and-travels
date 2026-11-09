@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Marcellus&family=Jost:wght@300;400;500;600&family=Noto+Serif+Tamil:wght@400&display=swap">
+<script src="./image-slot.js"></script>
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#f1e9db;color:#2a1712;font-family:Jost,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#6e1f1a;text-decoration:none}
+a:hover{color:#a8331f}
+::selection{background:#6e1f1a;color:#f1e9db}
+input::placeholder{color:rgba(241,233,219,.55)}
+select option{color:#2a1712}
+[data-track]::-webkit-scrollbar{display:none}
+:focus-visible{outline:2px solid #d9a23a;outline-offset:3px}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:relative;background:#f1e9db;color:#2a1712;overflow-x:clip">
+
+<sc-if value="{{ showOverlay }}" hint-placeholder-val="{{ true }}">
+<div ref="{{ overlayRef }}" style="position:fixed;inset:0;z-index:100;background:#f1e9db;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:34px;padding:32px;text-align:center;overflow:hidden">
+  <div style="position:relative;width:min(560px,86vw);height:150px;overflow:hidden">
+    <div data-sun="" style="position:absolute;left:50%;bottom:-120px;width:220px;height:220px;margin-left:-110px;border-radius:50%;background:#d9a23a"></div>
+    <div data-horizon="" style="position:absolute;left:0;right:0;bottom:0;height:1px;background:#2a1712"></div>
+  </div>
+  <div data-intro="1" style="font-family:Marcellus,serif;font-size:clamp(44px,8vw,104px);line-height:1;letter-spacing:.02em;color:#2a1712">Southern Heritage</div>
+  <div data-intro="2" style="font-size:12px;font-weight:500;letter-spacing:.5em;text-transform:uppercase;color:#6e1f1a">Tours &amp; Travels</div>
+  <div data-intro="3" style="font-family:'Noto Serif Tamil',serif;font-size:16px;color:#6b4a3a">வணக்கம் · സ്വാഗതം · Welcome</div>
+  <div data-intro="4" style="display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px">
+    <button onClick="{{ enterWithMusic }}" style="background:#6e1f1a;color:#f1e9db;border:0;border-radius:999px;padding:17px 30px;font:500 13px Jost,sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:#8a2a22">Begin with music</button>
+    <button onClick="{{ enterQuiet }}" style="background:transparent;color:#2a1712;border:1px solid #2a1712;border-radius:999px;padding:17px 30px;font:500 13px Jost,sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:#e6dac4">Begin quietly</button>
+  </div>
+</div>
+</sc-if>
+
+<div ref="{{ progRef }}" style="position:fixed;top:0;left:0;right:0;height:3px;background:#6e1f1a;transform-origin:0 50%;transform:scaleX(0);z-index:60"></div>
+
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:20px;padding:{{ navPad }};background:{{ navBg }};backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:{{ navShadow }};transition:all .5s ease">
+  <div style="display:flex;gap:28px;align-items:center">
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <sc-for list="{{ navLeft }}" as="l" hint-placeholder-count="3">
+        <a href="{{ l.href }}" style="color:#2a1712;font-size:14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase" style-hover="color:#6e1f1a">{{ l.label }}</a>
+      </sc-for>
+    </sc-if>
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" style="background:transparent;border:0;color:#2a1712;padding:8px 0;font:500 13px Jost,sans-serif;letter-spacing:.18em;text-transform:uppercase;cursor:pointer">{{ menuLabel }}</button>
+    </sc-if>
+  </div>
+  <a href="#top" style="display:flex;flex-direction:column;align-items:center;gap:3px;color:#2a1712">
+    <span style="font-family:Marcellus,serif;font-size:24px;line-height:1;letter-spacing:.04em">Southern Heritage</span>
+    <span style="font-size:9px;font-weight:500;letter-spacing:.5em;text-transform:uppercase;color:#6e1f1a">Tours &amp; Travels</span>
+  </a>
+  <div style="display:flex;gap:22px;align-items:center;justify-content:flex-end">
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <sc-for list="{{ navRight }}" as="l" hint-placeholder-count="3">
+        <a href="{{ l.href }}" style="color:#2a1712;font-size:14px;font-weight:500;letter-spacing:.08em;text-transform:uppercase" style-hover="color:#6e1f1a">{{ l.label }}</a>
+      </sc-for>
+    </sc-if>
+    <button onClick="{{ toggleAudio }}" aria-label="Toggle music" style="width:44px;height:44px;border-radius:50%;border:1px solid rgba(42,23,18,.35);background:transparent;display:flex;align-items:center;justify-content:center;gap:3px;cursor:pointer;flex-shrink:0" style-hover="border-color:#6e1f1a">
+      <span data-eq="1" style="width:2px;height:16px;background:#6e1f1a;transform:scaleY(.3)"></span>
+      <span data-eq="2" style="width:2px;height:16px;background:#6e1f1a;transform:scaleY(.3)"></span>
+      <span data-eq="3" style="width:2px;height:16px;background:#6e1f1a;transform:scaleY(.3)"></span>
+    </button>
+  </div>
+</header>
+
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:45;background:#f1e9db;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:100px 32px 40px">
+    <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+      <a href="{{ l.href }}" onClick="{{ closeMenu }}" style="font-family:Marcellus,serif;font-size:42px;color:#2a1712;padding:8px 0">{{ l.label }}</a>
+    </sc-for>
+  </div>
+</sc-if>
+
+<section id="top" data-screen-label="Hero" style="min-height:100vh;padding:130px clamp(20px,5vw,72px) 60px;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,460px),1fr));gap:clamp(40px,6vw,96px);align-items:center;position:relative;overflow:hidden">
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:3">{{ petalsEl }}</div>
+  <div style="display:flex;flex-direction:column;gap:32px;position:relative;z-index:2">
+    <div style="overflow:hidden"><div data-rise="0" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">Temple trails &amp; green escapes · South India</div></div>
+    <h1 style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(52px,7.4vw,118px);line-height:1;letter-spacing:-.01em;color:#2a1712">
+      <div style="overflow:hidden;padding-bottom:.08em"><div data-rise="1">Where the</div></div>
+      <div style="overflow:hidden;padding-bottom:.08em"><div data-rise="2" style="color:#6e1f1a">divine meets</div></div>
+      <div style="overflow:hidden;padding-bottom:.08em"><div data-rise="3">the wild.</div></div>
+    </h1>
+    <div style="overflow:hidden"><p data-rise="4" style="margin:0;max-width:480px;font-size:18px;font-weight:300;line-height:1.7;color:#5a3f33;text-wrap:pretty">Private, chauffeured journeys across southern Tamil Nadu and Kerala — ancient temples at dawn, waterfalls by noon, backwaters by dusk.</p></div>
+    <div style="overflow:hidden;padding:4px 0"><div data-rise="5" style="display:flex;gap:12px;flex-wrap:wrap">
+      <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="background:#6e1f1a;color:#f1e9db;border-radius:999px;padding:18px 30px;font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase" style-hover="background:#8a2a22;color:#f1e9db">Plan on WhatsApp</a>
+      <a href="#fleet" style="border:1px solid #2a1712;color:#2a1712;border-radius:999px;padding:18px 30px;font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase" style-hover="background:#2a1712;color:#f1e9db">Our fleet</a>
+    </div></div>
+  </div>
+  <div style="position:relative;display:flex;justify-content:center;z-index:1">
+    <div data-wipe="hero" style="position:relative;width:min(100%,520px);aspect-ratio:3/4;border-radius:999px 999px 0 0;overflow:hidden;background:#e6dac4">
+      <div ref="{{ heroImgRef }}" style="position:absolute;inset:-8% 0">
+        <image-slot id="v2-hero" shape="rect" placeholder="Hero: gopuram against sky, or Munnar hills"></image-slot>
+      </div>
+    </div>
+    <div data-wipe="hero2" style="position:absolute;left:0;bottom:8%;width:min(38%,200px);aspect-ratio:1;border-radius:50%;overflow:hidden;border:8px solid #f1e9db;background:#e6dac4">
+      <image-slot id="v2-hero-circle" shape="rect" placeholder="Diya / jasmine detail"></image-slot>
+    </div>
+    <div ref="{{ badgeRef }}" style="position:absolute;right:0;top:6%;width:120px;height:120px;border-radius:50%;background:#d9a23a;color:#2a1712;display:flex;align-items:center;justify-content:center;text-align:center;font-family:Marcellus,serif;font-size:15px;line-height:1.2;padding:14px">Tamil Nadu<br>&amp; Kerala</div>
+  </div>
+</section>
+
+<section id="about" data-screen-label="About" style="padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px);border-top:1px solid rgba(42,23,18,.15)">
+  <div style="max-width:1000px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:36px;text-align:center">
+    <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">About us</div>
+    <p data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-size:clamp(28px,3.4vw,46px);line-height:1.3;color:#2a1712;text-wrap:balance">We are a Madurai family of drivers and guides, taking travellers to the <span style="color:#6e1f1a">temples, shores and hills</span> of the south we grew up in — calmly, safely, and on time.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;width:100%;margin-top:24px">
+      <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="3">
+        <div data-reveal="" style="display:flex;flex-direction:column;align-items:center;gap:12px;padding:28px 16px">
+          <span style="width:12px;height:12px;background:#d9a23a;transform:rotate(45deg)"></span>
+          <span style="font-family:Marcellus,serif;font-size:24px">{{ p.t }}</span>
+          <span style="font-size:15px;font-weight:300;line-height:1.6;color:#5a3f33;max-width:260px">{{ p.d }}</span>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="destinations" data-screen-label="Destinations" style="background:#2a1712;color:#f1e9db;padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:28px">
+      <div style="display:flex;flex-direction:column;gap:20px">
+        <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#d9a23a">Destinations</div>
+        <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Eleven places,<br>one sacred south.</h2>
+      </div>
+      <div data-reveal="" data-delay="200" style="display:flex;gap:8px;padding:6px;border:1px solid rgba(241,233,219,.25);border-radius:999px">
+        <sc-for list="{{ regionTabs }}" as="t" hint-placeholder-count="2">
+          <button onClick="{{ t.onClick }}" style="background:{{ t.bg }};color:{{ t.fg }};border:0;border-radius:999px;padding:13px 24px;font:500 13px Jost,sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;transition:all .4s">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(32px,5vw,80px);align-items:start">
+      <div style="display:flex;flex-direction:column;border-top:1px solid rgba(241,233,219,.2)">
+        <sc-for list="{{ destList }}" as="d" hint-placeholder-count="6">
+          <div data-dest="" onMouseEnter="{{ d.onEnter }}" onClick="{{ d.onEnter }}" style="display:grid;grid-template-columns:44px 1fr;gap:6px 18px;padding:26px 0;border-bottom:1px solid rgba(241,233,219,.2);cursor:pointer;opacity:{{ d.op }};transition:opacity .5s">
+            <span style="font-size:13px;color:#d9a23a;padding-top:14px">{{ d.n }}</span>
+            <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:6px 18px">
+              <span style="font-family:Marcellus,serif;font-size:clamp(34px,3.6vw,52px);line-height:1.05;transform:translateX({{ d.shift }});transition:transform .6s cubic-bezier(.2,.7,.1,1)">{{ d.name }}</span>
+              <span style="font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#d9a23a">{{ d.tag }}</span>
+            </div>
+            <span></span>
+            <span style="font-size:15px;font-weight:300;line-height:1.6;color:#d8ccb8;max-width:460px">{{ d.line }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="position:sticky;top:110px;display:flex;flex-direction:column;align-items:center">
+        <div style="position:relative;width:min(100%,500px);aspect-ratio:4/5;border-radius:999px 999px 0 0;overflow:hidden;background:#3a231b">
+          <sc-for list="{{ destList }}" as="d" hint-placeholder-count="1">
+            <div style="position:absolute;inset:0;opacity:{{ d.imgOp }};transform:scale({{ d.imgScale }});transition:opacity .8s ease,transform 1.6s cubic-bezier(.2,.7,.1,1);pointer-events:{{ d.pe }}">
+              <image-slot id="v2-dest-{{ d.key }}" shape="rect" placeholder="{{ d.ph }}"></image-slot>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="fleet" data-screen-label="Fleet" style="padding:clamp(80px,11vw,150px) 0">
+  <div style="max-width:1320px;margin:0 auto;padding:0 clamp(20px,5vw,72px);display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:28px">
+    <div style="display:flex;flex-direction:column;gap:20px;max-width:640px">
+      <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">Our fleet</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Choose your <span style="color:#6e1f1a">chariot.</span></h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:17px;font-weight:300;line-height:1.7;color:#5a3f33">Air-conditioned, spotless and chauffeured by drivers who know every ghat road. From two travellers to seventeen.</p>
+    </div>
+    <div data-reveal="" data-delay="200" style="display:flex;flex-wrap:wrap;gap:10px;align-items:center">
+      <sc-for list="{{ fleetTabs }}" as="t" hint-placeholder-count="4">
+        <button onClick="{{ t.onClick }}" style="background:{{ t.bg }};color:{{ t.fg }};border:1px solid #2a1712;border-radius:999px;padding:12px 20px;font:500 13px Jost,sans-serif;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;transition:all .4s">{{ t.label }}</button>
+      </sc-for>
+      <span style="width:1px;height:28px;background:rgba(42,23,18,.25);margin:0 6px"></span>
+      <button onClick="{{ fleetPrev }}" aria-label="Previous" style="width:48px;height:48px;border-radius:50%;border:1px solid #2a1712;background:transparent;color:#2a1712;font-size:18px;cursor:pointer" style-hover="background:#2a1712;color:#f1e9db">←</button>
+      <button onClick="{{ fleetNext }}" aria-label="Next" style="width:48px;height:48px;border-radius:50%;border:1px solid #2a1712;background:transparent;color:#2a1712;font-size:18px;cursor:pointer" style-hover="background:#2a1712;color:#f1e9db">→</button>
+    </div>
+  </div>
+  <div ref="{{ trackRef }}" data-track="" style="margin-top:56px;display:flex;gap:24px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding:0 clamp(20px,5vw,72px) 20px;scroll-padding:0 clamp(20px,5vw,72px)">
+    <sc-for list="{{ fleetList }}" as="v" hint-placeholder-count="4">
+      <article data-fleet="" style="flex:0 0 min(84vw,380px);scroll-snap-align:start;background:#e9dfcd;border-radius:220px 220px 0 0;overflow:hidden;display:flex;flex-direction:column;transition:transform .6s cubic-bezier(.2,.7,.1,1),background .5s" style-hover="transform:translateY(-8px);background:#e2d5bf">
+        <div style="aspect-ratio:1/1;position:relative;margin:14px 14px 0;border-radius:200px 200px 0 0;overflow:hidden;background:#ddd0b8"><image-slot id="v2-fleet-{{ v.key }}" shape="rect" placeholder="{{ v.ph }}"></image-slot></div>
+        <div style="padding:28px 28px 30px;display:flex;flex-direction:column;gap:18px;flex:1">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px">
+            <span style="font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6e1f1a">{{ v.cat }}</span>
+            <span style="font-size:13px;color:#6b4a3a">{{ v.n }} / 06</span>
+          </div>
+          <h3 style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:34px;line-height:1.05">{{ v.name }}</h3>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <span style="border:1px solid rgba(42,23,18,.3);border-radius:999px;padding:7px 14px;font-size:13px">{{ v.seats }} seats</span>
+            <span style="border:1px solid rgba(42,23,18,.3);border-radius:999px;padding:7px 14px;font-size:13px">{{ v.bags }}</span>
+            <span style="border:1px solid rgba(42,23,18,.3);border-radius:999px;padding:7px 14px;font-size:13px">AC</span>
+          </div>
+          <p style="margin:0;font-size:15px;font-weight:300;line-height:1.6;color:#5a3f33;flex:1"><span style="font-weight:500;color:#2a1712">{{ v.best }}.</span> {{ v.note }}</p>
+          <a href="{{ v.wa }}" target="_blank" rel="noopener" style="display:flex;justify-content:space-between;align-items:center;background:#2a1712;color:#f1e9db;border-radius:999px;padding:15px 22px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase" style-hover="background:#6e1f1a;color:#f1e9db">Enquire <span>→</span></a>
+        </div>
+      </article>
+    </sc-for>
+  </div>
+</section>
+
+<section id="packages" data-screen-label="Packages" style="background:#e6dac4;padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
+      <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">Tour packages</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Journeys we love.</h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:17px;font-weight:300;line-height:1.7;color:#5a3f33;max-width:520px">Every itinerary can be changed — days, temples, hotels, pace.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <sc-for list="{{ packages }}" as="p" hint-placeholder-count="4">
+        <div data-reveal="" style="background:{{ p.bg }};color:{{ p.fg }};border-radius:28px;transition:background .6s,color .6s;overflow:hidden">
+          <button onClick="{{ p.toggle }}" style="width:100%;background:transparent;border:0;color:inherit;cursor:pointer;display:grid;grid-template-columns:auto 1fr auto;gap:24px;align-items:center;padding:28px clamp(22px,3vw,40px);text-align:left">
+            <span style="font-family:Marcellus,serif;font-size:clamp(36px,4vw,56px);line-height:1;color:{{ p.numC }}">{{ p.days }}</span>
+            <span style="display:flex;flex-direction:column;gap:6px">
+              <span style="font-family:Marcellus,serif;font-size:clamp(24px,2.6vw,34px);line-height:1.1">{{ p.title }}</span>
+              <span style="font:400 13px Jost,sans-serif;letter-spacing:.2em;text-transform:uppercase;opacity:.75">{{ p.dur }}</span>
+            </span>
+            <span style="width:48px;height:48px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:22px;transform:rotate({{ p.rot }});transition:transform .5s">+</span>
+          </button>
+          <sc-if value="{{ p.open }}" hint-placeholder-val="{{ false }}">
+            <div data-pkg-body="" style="padding:0 clamp(22px,3vw,40px) 36px;display:flex;flex-direction:column;gap:26px">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:12px">
+                <sc-for list="{{ p.stops }}" as="s" hint-placeholder-count="4">
+                  <span style="display:flex;align-items:center;gap:12px"><span style="width:8px;height:8px;border-radius:50%;background:#d9a23a"></span><span style="font-family:Marcellus,serif;font-size:22px">{{ s }}</span></span>
+                </sc-for>
+              </div>
+              <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:20px">
+                <p style="margin:0;font-size:16px;font-weight:300;line-height:1.65;max-width:560px;color:#e9dccb">{{ p.hl }}</p>
+                <a href="{{ p.wa }}" target="_blank" rel="noopener" style="background:#d9a23a;color:#2a1712;border-radius:999px;padding:16px 26px;font-size:13px;font-weight:500;letter-spacing:.16em;text-transform:uppercase" style-hover="background:#e8b856;color:#2a1712">Enquire on WhatsApp</a>
+              </div>
+            </div>
+          </sc-if>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Why us" style="background:#6e1f1a;color:#f1e9db;padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:64px">
+    <h2 data-reveal="" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02;max-width:800px">Why families trust us with their pilgrimages.</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:48px 40px">
+      <sc-for list="{{ reasons }}" as="r" hint-placeholder-count="4">
+        <div data-reveal="" style="display:flex;flex-direction:column;gap:16px;padding-top:24px;border-top:1px solid rgba(241,233,219,.35)">
+          <span style="font-family:Marcellus,serif;font-size:20px;color:#e8b856">{{ r.n }}</span>
+          <h3 style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:26px;line-height:1.2">{{ r.t }}</h3>
+          <p style="margin:0;font-size:16px;font-weight:300;line-height:1.7;color:#ecd9cc">{{ r.d }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Testimonials" style="padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
+      <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">Traveller stories</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Kind words.</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px">
+      <sc-for list="{{ quotes }}" as="q" hint-placeholder-count="3">
+        <figure data-reveal="" style="margin:0;background:#e9dfcd;border-radius:28px;padding:40px 36px;display:flex;flex-direction:column;gap:24px;transition:transform .6s cubic-bezier(.2,.7,.1,1)" style-hover="transform:translateY(-6px)">
+          <span style="font-family:Marcellus,serif;font-size:80px;line-height:.6;color:#d9a23a;height:40px">“</span>
+          <blockquote style="margin:0;font-family:Marcellus,serif;font-size:22px;line-height:1.45;flex:1;text-wrap:pretty">{{ q.q }}</blockquote>
+          <figcaption style="display:flex;flex-direction:column;gap:4px;padding-top:20px;border-top:1px solid rgba(42,23,18,.18)"><span style="font-weight:500">{{ q.who }}</span><span style="font-size:14px;color:#6b4a3a">{{ q.trip }}</span></figcaption>
+        </figure>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" data-screen-label="Gallery" style="background:#2a1712;color:#f1e9db;padding:clamp(80px,11vw,150px) 0;overflow:hidden">
+  <div style="padding:0 clamp(20px,5vw,72px);max-width:1320px;margin:0 auto 56px;display:flex;flex-direction:column;gap:20px">
+    <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#d9a23a">Gallery</div>
+    <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Moments from the road.</h2>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:18px">
+    <div data-drift="1" style="display:flex;gap:18px;width:max-content;padding-left:clamp(20px,5vw,72px)">
+      <sc-for list="{{ galleryA }}" as="g" hint-placeholder-count="5">
+        <div style="width:{{ g.w }};height:300px;border-radius:{{ g.r }};overflow:hidden;position:relative;background:#3a231b;flex-shrink:0"><image-slot id="v2-gal-{{ g.key }}" shape="rect" placeholder="{{ g.ph }}"></image-slot></div>
+      </sc-for>
+    </div>
+    <div data-drift="-1" style="display:flex;gap:18px;width:max-content;padding-left:clamp(20px,5vw,72px)">
+      <sc-for list="{{ galleryB }}" as="g" hint-placeholder-count="5">
+        <div style="width:{{ g.w }};height:300px;border-radius:{{ g.r }};overflow:hidden;position:relative;background:#3a231b;flex-shrink:0"><image-slot id="v2-gal-{{ g.key }}" shape="rect" placeholder="{{ g.ph }}"></image-slot></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="enquire" data-screen-label="Enquiry" style="background:#6e1f1a;color:#f1e9db;padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center">
+      <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#e8b856">Enquire</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">Let’s plan your yatra.</h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:17px;font-weight:300;line-height:1.7;color:#ecd9cc;max-width:520px">Your details open in WhatsApp, ready to send. We usually reply within the hour.</p>
+    </div>
+    <form onSubmit="{{ submitForm }}" data-reveal="" data-delay="150" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:28px">
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Your name<input name="name" value="{{ form.name }}" onChange="{{ onField }}" required="" placeholder="Full name" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Phone<input name="phone" type="tel" value="{{ form.phone }}" onChange="{{ onField }}" placeholder="+91" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Pickup city<input name="pickup" value="{{ form.pickup }}" onChange="{{ onField }}" placeholder="e.g. Trivandrum airport" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Destination<select name="dest" value="{{ form.dest }}" onChange="{{ onField }}" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none">
+        <option value="">Choose one</option>
+        <sc-for list="{{ destNames }}" as="o" hint-placeholder-count="11"><option value="{{ o }}">{{ o }}</option></sc-for>
+      </select></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Vehicle<select name="vehicle" value="{{ form.vehicle }}" onChange="{{ onField }}" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none">
+        <option value="">Not sure yet</option>
+        <sc-for list="{{ vehicleNames }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+      </select></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Travel date<input name="date" type="date" value="{{ form.date }}" onChange="{{ onField }}" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none;color-scheme:dark"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:12px;font-weight:500;letter-spacing:.22em;text-transform:uppercase;color:#ecd9cc">Travellers<input name="pax" type="number" min="1" value="{{ form.pax }}" onChange="{{ onField }}" placeholder="How many?" style="font:300 18px Jost,sans-serif;letter-spacing:0;text-transform:none;color:#f1e9db;background:rgba(241,233,219,.08);border:1px solid rgba(241,233,219,.3);border-radius:14px;padding:16px 18px;outline:none"></label>
+      <div style="display:flex;align-items:flex-end">
+        <button type="submit" style="width:100%;background:#d9a23a;color:#2a1712;border:0;border-radius:999px;padding:20px 26px;font:500 14px Jost,sans-serif;letter-spacing:.16em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:#e8b856">Send on WhatsApp →</button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="Contact" style="padding:clamp(80px,11vw,150px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(40px,6vw,90px);align-items:center">
+    <div style="display:flex;flex-direction:column;gap:32px">
+      <div data-reveal="" style="font-size:13px;font-weight:500;letter-spacing:.32em;text-transform:uppercase;color:#6e1f1a">Contact</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:Marcellus,serif;font-weight:400;font-size:clamp(42px,5.4vw,80px);line-height:1.02">From the temple city of Madurai.</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:28px">
+        <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="4">
+          <a data-reveal="" href="{{ c.href }}" style="display:flex;flex-direction:column;gap:6px;color:#2a1712" style-hover="color:#6e1f1a">
+            <span style="font-size:12px;font-weight:500;letter-spacing:.24em;text-transform:uppercase;color:#6e1f1a">{{ c.k }}</span>
+            <span style="font-family:Marcellus,serif;font-size:22px">{{ c.v }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+    <div data-wipe="map" style="position:relative;aspect-ratio:1/1;max-height:560px;border-radius:999px 999px 0 0;overflow:hidden;background:#e6dac4">
+      <iframe title="Map" src="https://maps.google.com/maps?q=Madurai%2C%20Tamil%20Nadu&amp;z=7&amp;output=embed" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;filter:sepia(.35) saturate(.8)"></iframe>
+    </div>
+  </div>
+</section>
+
+<footer style="background:#2a1712;color:#f1e9db;padding:clamp(70px,9vw,120px) clamp(20px,5vw,72px) 36px">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;align-items:center;gap:40px;text-align:center">
+    <span style="width:14px;height:14px;background:#d9a23a;transform:rotate(45deg)"></span>
+    <div data-reveal="" style="font-family:Marcellus,serif;font-size:clamp(48px,9vw,150px);line-height:.95;letter-spacing:.01em">Southern Heritage</div>
+    <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="background:#d9a23a;color:#2a1712;border-radius:999px;padding:18px 30px;font-size:13px;font-weight:500;letter-spacing:.18em;text-transform:uppercase" style-hover="background:#e8b856;color:#2a1712">Start a conversation</a>
+    <div style="width:100%;display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px;padding-top:28px;border-top:1px solid rgba(241,233,219,.2);font-size:14px;color:#cdbfa9">
+      <span>© 2026 Southern Heritage Tours &amp; Travels</span>
+      <span style="font-family:'Noto Serif Tamil',serif">தமிழ்நாடு · കേരളം</span>
+      <a href="#top" style="color:#e8b856">Back to top ↑</a>
+    </div>
+  </div>
+</footer>
+
+<a href="{{ waGeneral }}" target="_blank" rel="noopener" style="position:fixed;right:22px;bottom:22px;z-index:40;display:flex;align-items:center;gap:10px;background:#6e1f1a;color:#f1e9db;border-radius:999px;padding:15px 22px;font-size:13px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 14px 34px rgba(42,23,18,.3)" style-hover="background:#8a2a22;color:#f1e9db"><span ref="{{ dotRef }}" style="width:8px;height:8px;border-radius:50%;background:#e8b856"></span>WhatsApp</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;whatsappNumber&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;919800000000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contact&quot;},&quot;showIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;petals&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;musicVolume&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.6,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Audio&quot;}}">
+class Component extends DCLogic {
+  state = { introDone: false, playing: false, scrolled: false, wide: true, menuOpen: false, region: 'tn', activeDest: 0, fleetFilter: 'all', openPkg: 0,
+    form: { name: '', phone: '', pickup: '', dest: '', vehicle: '', date: '', pax: '' } };
+  rootRef = React.createRef(); overlayRef = React.createRef(); progRef = React.createRef(); heroImgRef = React.createRef();
+  canvasRef = React.createRef(); trackRef = React.createRef(); badgeRef = React.createRef(); dotRef = React.createRef();
+  ease = 'cubic-bezier(.2,.7,.1,1)';
+
+  wa(msg) { const n = (this.props.whatsappNumber ?? '919800000000').replace(/\D/g, ''); return `https://wa.me/${n}?text=${encodeURIComponent(msg)}`; }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this._prev = { region: this.state.region, fleetFilter: this.state.fleetFilter, playing: this.state.playing, openPkg: this.state.openPkg };
+    const root = this.rootRef.current;
+    this.onScroll = () => {
+      const y = window.scrollY, h = document.documentElement.scrollHeight - innerHeight;
+      if (this.progRef.current) this.progRef.current.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+      if (this.heroImgRef.current && y < innerHeight * 1.3) this.heroImgRef.current.style.transform = `translateY(${y * 0.12}px)`;
+      if (this.badgeRef.current) this.badgeRef.current.style.rotate = `${y * 0.15}deg`;
+      root.querySelectorAll('[data-drift]').forEach(el => {
+        const r = el.parentElement.getBoundingClientRect(), p = (innerHeight - r.top) / (innerHeight + r.height);
+        if (p > -0.2 && p < 1.2) el.style.transform = `translateX(${(+el.dataset.drift > 0 ? -p : p - 1) * 30}%)`;
+      });
+      const s = y > 30; if (s !== this.state.scrolled) this.setState({ scrolled: s });
+    };
+    this.onResize = () => { const w = innerWidth >= 1000; if (w !== this.state.wide) this.setState({ wide: w, menuOpen: false }); };
+    addEventListener('scroll', this.onScroll, { passive: true }); addEventListener('resize', this.onResize);
+    this.onResize(); this.onScroll();
+
+    root.querySelectorAll('[data-rise]').forEach(el => { el.style.transform = 'translateY(115%)'; });
+    root.querySelectorAll('[data-wipe^="hero"]').forEach(el => { el.style.clipPath = 'inset(100% 0 0 0)'; });
+    this.io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; const el = e.target; this.io.unobserve(el);
+      const d = this.reduced ? 1 : 1300, delay = +(el.dataset.delay || 0);
+      if (el.dataset.wipe !== undefined) el.animate([{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0 0 0 0)' }], { duration: d + 300, delay, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
+      else el.animate([{ opacity: 0, transform: 'translateY(36px)' }, { opacity: 1, transform: 'none' }], { duration: d, delay, easing: this.ease, fill: 'forwards' });
+    }), { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    root.querySelectorAll('[data-reveal]').forEach(el => { el.style.opacity = '0'; this.io.observe(el); });
+    root.querySelectorAll('[data-wipe="map"]').forEach(el => { el.style.clipPath = 'inset(100% 0 0 0)'; this.io.observe(el); });
+
+    if (this.dotRef.current) this.dotRef.current.animate([{ opacity: 1, transform: 'scale(1)' }, { opacity: .3, transform: 'scale(.6)' }], { duration: 1200, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' });
+    if ((this.props.petals ?? true) && !this.reduced) this.startPetals();
+    if (this.props.showIntro ?? true) this.playIntro(); else { this.setState({ introDone: true }); this.playHero(0); }
+    if (this.props.autoplayMusic ?? true) this.autoplay();
+  }
+
+  autoplay() {
+    this.startAudio();
+    // Browsers keep the AudioContext suspended until a user gesture; resume on the first one.
+    const evs = ['pointerdown', 'keydown', 'touchstart'];
+    const off = () => evs.forEach(n => removeEventListener(n, this.onGesture, true));
+    this.onGesture = e => {
+      if (e.target && e.target.closest && e.target.closest('button')) return off();
+      off(); if (this.wantMusic && this.ac && this.ac.state !== 'running') this.startAudio();
+    };
+    evs.forEach(n => addEventListener(n, this.onGesture, true));
+  }
+
+  componentWillUnmount() {
+    removeEventListener('scroll', this.onScroll); removeEventListener('resize', this.onResize);
+    this.io && this.io.disconnect(); this.ro && this.ro.disconnect(); cancelAnimationFrame(this.raf);
+    clearInterval(this.audioTimer); this.ac && this.ac.close();
+    if (this.onGesture) ['pointerdown', 'keydown', 'touchstart'].forEach(n => removeEventListener(n, this.onGesture, true));
+  }
+
+  componentDidUpdate() {
+    const root = this.rootRef.current; if (!root) return;
+    const ps = this._prev || this.state, s = this.state;
+    this._prev = { region: s.region, fleetFilter: s.fleetFilter, playing: s.playing, openPkg: s.openPkg };
+    if (ps.region !== s.region) this.stagger(root.querySelectorAll('[data-dest]'), 'translateX(-30px)');
+    if (ps.fleetFilter !== s.fleetFilter) { this.stagger(root.querySelectorAll('[data-fleet]'), 'translateY(40px)'); this.trackRef.current && this.trackRef.current.scrollTo({ left: 0, behavior: 'smooth' }); }
+    if (ps.playing !== s.playing) this.animEq(s.playing);
+    if (ps.openPkg !== s.openPkg) root.querySelectorAll('[data-pkg-body]').forEach(el => el.animate([{ opacity: 0, transform: 'translateY(-12px)' }, { opacity: 1, transform: 'none' }], { duration: 700, easing: this.ease }));
+  }
+
+  stagger(nodes, from) {
+    nodes.forEach((el, i) => el.animate([{ opacity: 0, transform: from }, { opacity: 1, transform: 'none' }], { duration: 800, delay: i * 70, easing: this.ease, fill: 'both' }));
+  }
+
+  animEq(on) {
+    (this.eqAnims || []).forEach(a => a.cancel()); this.eqAnims = [];
+    if (!on) return;
+    this.rootRef.current.querySelectorAll('[data-eq]').forEach((b, i) => this.eqAnims.push(b.animate(
+      [{ transform: 'scaleY(.3)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(.5)' }, { transform: 'scaleY(.85)' }, { transform: 'scaleY(.3)' }],
+      { duration: 1000 + i * 260, iterations: Infinity, easing: 'ease-in-out' })));
+  }
+
+  playIntro() {
+    const o = this.overlayRef.current; if (!o) return;
+    const h = o.querySelector('[data-horizon]'), sun = o.querySelector('[data-sun]');
+    h && h.animate([{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }], { duration: 1400, delay: 200, easing: this.ease, fill: 'both' });
+    sun && sun.animate([{ transform: 'translateY(120px)', background: '#a8331f' }, { transform: 'translateY(-40px)', background: '#d9a23a' }], { duration: 3200, delay: 900, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' });
+    o.querySelectorAll('[data-intro]').forEach(el => el.animate([{ opacity: 0, transform: 'translateY(24px)', letterSpacing: el.dataset.intro === '1' ? '.2em' : null }, { opacity: 1, transform: 'none' }].map(k => { if (k.letterSpacing === null) delete k.letterSpacing; return k; }),
+      { duration: 1800, delay: 1400 + (+el.dataset.intro) * 380, easing: this.ease, fill: 'both' }));
+  }
+
+  enter(music) {
+    if (music) this.startAudio(); else if (this.wantMusic) this.stopAudio();
+    const o = this.overlayRef.current;
+    this.playHero(600);
+    if (!o) return this.setState({ introDone: true });
+    const sun = o.querySelector('[data-sun]');
+    sun && sun.animate([{ transform: 'translateY(-40px) scale(1)' }, { transform: 'translateY(-40px) scale(14)' }], { duration: 1300, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
+    const a = o.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 900, delay: 700, easing: 'ease', fill: 'forwards' });
+    a.onfinish = () => this.setState({ introDone: true });
+  }
+
+  playHero(delay) {
+    const root = this.rootRef.current;
+    root.querySelectorAll('[data-rise]').forEach(el => el.animate([{ transform: 'translateY(115%)' }, { transform: 'translateY(0)' }],
+      { duration: 1500, delay: delay + 200 + (+el.dataset.rise) * 130, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }));
+    root.querySelectorAll('[data-wipe^="hero"]').forEach((el, i) => el.animate([{ clipPath: 'inset(100% 0 0 0)' }, { clipPath: 'inset(0 0 0 0)' }],
+      { duration: 1800, delay: delay + 300 + i * 600, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' }));
+    if (this.badgeRef.current) this.badgeRef.current.animate([{ transform: 'scale(0)' }, { transform: 'scale(1)' }], { duration: 1200, delay: delay + 1500, easing: 'cubic-bezier(.34,1.56,.64,1)', fill: 'both' });
+  }
+
+  startPetals() {
+    const c = this.canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d'); let W = 0, H = 0;
+    const fit = () => { const r = c.parentElement.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; c.width = W * d; c.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); };
+    fit(); this.ro = new ResizeObserver(fit); this.ro.observe(c.parentElement);
+    const cols = ['#e39a2d', '#d9a23a', '#c4472b', '#eeb94a'];
+    const ps = Array.from({ length: 26 }, () => ({ x: Math.random(), y: Math.random(), sz: 5 + Math.random() * 7, vy: .012 + Math.random() * .02, rot: Math.random() * 6.28, vr: (Math.random() - .5) * .002, ph: Math.random() * 6.28, c: cols[Math.floor(Math.random() * cols.length)] }));
+    let last = performance.now();
+    const loop = t => {
+      const dt = Math.min(t - last, 50); last = t;
+      ctx.clearRect(0, 0, W, H);
+      for (const p of ps) {
+        p.y += p.vy * dt / 1000 * 4; p.rot += p.vr * dt; if (p.y > 1.06) { p.y = -.06; p.x = Math.random(); }
+        const x = (p.x + Math.sin(t * .0005 + p.ph) * .03) * W, y = p.y * H, flip = Math.abs(Math.sin(t * .0012 + p.ph));
+        ctx.save(); ctx.translate(x, y); ctx.rotate(p.rot); ctx.scale(1, .35 + flip * .65);
+        ctx.globalAlpha = .75; ctx.fillStyle = p.c; ctx.beginPath(); ctx.ellipse(0, 0, p.sz, p.sz * .55, 0, 0, 6.283); ctx.fill(); ctx.restore();
+      }
+      this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  buildAudio() {
+    const ac = this.ac = new (window.AudioContext || window.webkitAudioContext)();
+    this.master = ac.createGain(); this.master.gain.value = 0; this.master.connect(ac.destination);
+    const len = ac.sampleRate * 4, ir = ac.createBuffer(2, len, ac.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+    const rev = ac.createConvolver(); rev.buffer = ir; const wet = ac.createGain(); wet.gain.value = .55; rev.connect(wet); wet.connect(this.master);
+    this.bus = ac.createGain(); this.bus.connect(this.master); this.bus.connect(rev);
+    const nb = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    this.noise = nb; this.sa = 138.59; this.nextPluck = ac.currentTime + .1; this.pluckIdx = 0; this.nextPhrase = ac.currentTime + 2.5; this.deg = 0;
+  }
+  pluck(f, t, amp) {
+    const ac = this.ac;
+    for (let h = 1; h <= 7; h++) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = f * h * (1 + (Math.random() - .5) * .002);
+      const pk = amp * .07 / Math.pow(h, .8), dec = 4.5 / Math.sqrt(h);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(pk, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + dec);
+      o.connect(g); g.connect(this.bus); o.start(t); o.stop(t + dec + .1);
+    }
+  }
+  phrase(t0) {
+    const ac = this.ac, ratios = [1, 9 / 8, 5 / 4, 3 / 2, 5 / 3];
+    const fOf = d => { const oct = Math.floor(d / 5), i = ((d % 5) + 5) % 5; return this.sa * 4 * ratios[i] * Math.pow(2, oct); };
+    const n = 3 + Math.floor(Math.random() * 5), durs = [.45, .7, .9, 1.2, 1.8];
+    const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), g2 = ac.createGain(), lp = ac.createBiquadFilter();
+    o.type = 'sine'; o2.type = 'triangle'; g2.gain.value = .18; lp.type = 'lowpass'; lp.frequency.value = 2600;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 5.2; lg.gain.setValueAtTime(0, t0); lg.gain.linearRampToValueAtTime(4, t0 + 1);
+    lfo.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(lp); lp.connect(this.bus);
+    let t = t0, f = fOf(this.deg);
+    o.frequency.setValueAtTime(f, t); o2.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.07, t + .25);
+    for (let k = 0; k < n; k++) {
+      const d = durs[Math.floor(Math.random() * durs.length)];
+      if (k > 0) {
+        this.deg = Math.max(-1, Math.min(8, this.deg + [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]));
+        f = fOf(this.deg); o.frequency.setTargetAtTime(f, t, .05); o2.frequency.setTargetAtTime(f, t, .05);
+        g.gain.setTargetAtTime(.06 + Math.random() * .025, t, .1);
+      }
+      t += d;
+    }
+    t += .6; g.gain.setTargetAtTime(0, t - .5, .25);
+    const br = ac.createBufferSource(), bf = ac.createBiquadFilter(), bg = ac.createGain();
+    br.buffer = this.noise; br.loop = true; bf.type = 'bandpass'; bf.frequency.value = 1800; bf.Q.value = .8;
+    bg.gain.setValueAtTime(0, t0); bg.gain.linearRampToValueAtTime(.012, t0 + .2); bg.gain.setTargetAtTime(0, t - .5, .25);
+    br.connect(bf); bf.connect(bg); bg.connect(this.bus);
+    [o, o2, lfo, br].forEach(s => { s.start(t0); s.stop(t + 1.5); });
+    if (Math.random() < .3) this.deg = 0;
+    return t;
+  }
+  schedule() {
+    const ac = this.ac, ahead = ac.currentTime + .6;
+    const pat = [[this.sa * .75, .9], [this.sa, .7], [this.sa, .7], [this.sa * .5, 1]];
+    while (this.nextPluck < ahead) { const [f, a] = pat[this.pluckIdx % 4]; this.pluck(f, this.nextPluck, a); this.pluckIdx++; this.nextPluck += this.pluckIdx % 4 === 0 ? 1.6 : 1.05; }
+    if (this.nextPhrase < ahead) { const end = this.phrase(this.nextPhrase); this.nextPhrase = end + 1.5 + Math.random() * 3; }
+  }
+  startAudio() {
+    try {
+      if (!this.ac) { this.buildAudio(); this.ac.onstatechange = () => this.setState({ playing: !!this.wantMusic && this.ac.state === 'running' }); }
+      this.wantMusic = true; this.ac.resume(); const now = this.ac.currentTime, vol = this.props.musicVolume ?? .6;
+      this.nextPluck = Math.max(this.nextPluck, now + .05); this.nextPhrase = Math.max(this.nextPhrase, now + 2);
+      this.master.gain.cancelScheduledValues(now); this.master.gain.setValueAtTime(this.master.gain.value, now); this.master.gain.linearRampToValueAtTime(vol, now + 2.5);
+      clearInterval(this.audioTimer); this.audioTimer = setInterval(() => this.schedule(), 120); this.schedule();
+      this.setState({ playing: this.ac.state === 'running' });
+    } catch (e) { console.warn('Audio unavailable', e); }
+  }
+  stopAudio() {
+    this.wantMusic = false;
+    if (!this.ac) return; const now = this.ac.currentTime;
+    this.master.gain.cancelScheduledValues(now); this.master.gain.setValueAtTime(this.master.gain.value, now); this.master.gain.linearRampToValueAtTime(0, now + 1.2);
+    clearInterval(this.audioTimer); setTimeout(() => { if (!this.state.playing) this.ac.suspend(); }, 1400);
+    this.setState({ playing: false });
+  }
+
+  renderVals() {
+    const s = this.state;
+    const dests = {
+      tn: [
+        { key: 'madurai', name: 'Madurai', tag: 'Temple city', line: 'Meenakshi Amman Temple and its towering, painted gopurams.', ph: 'Meenakshi Amman gopuram' },
+        { key: 'rameswaram', name: 'Rameswaram', tag: 'Island', line: 'Ramanathaswamy\u2019s endless pillared corridors and the Pamban bridge.', ph: 'Ramanathaswamy corridor' },
+        { key: 'kanyakumari', name: 'Kanyakumari', tag: 'Land\u2019s end', line: 'Sunrise where three seas meet, the Vivekananda Rock offshore.', ph: 'Kanyakumari sunrise' },
+        { key: 'tiruchendur', name: 'Tiruchendur', tag: 'Shore temple', line: 'Lord Murugan\u2019s seaside abode on the Gulf of Mannar.', ph: 'Tiruchendur temple' },
+        { key: 'courtallam', name: 'Courtallam', tag: 'Waterfalls', line: 'The \u201cSpa of the South\u201d, its falls at their best in the monsoon.', ph: 'Courtallam falls' },
+        { key: 'kodaikanal', name: 'Kodaikanal', tag: 'Hills', line: 'A star-shaped lake and pine forests high in the Palani hills.', ph: 'Kodaikanal lake' }
+      ],
+      kl: [
+        { key: 'munnar', name: 'Munnar', tag: 'Tea hills', line: 'Tea estates folding over the Western Ghats, cool all year.', ph: 'Munnar tea estates' },
+        { key: 'alleppey', name: 'Alleppey', tag: 'Backwaters', line: 'Houseboat days on palm-fringed canals and paddy fields.', ph: 'Alleppey houseboat' },
+        { key: 'thekkady', name: 'Thekkady', tag: 'Forest', line: 'Periyar\u2019s lake and forests, with spice gardens all around.', ph: 'Periyar lake' },
+        { key: 'guruvayur', name: 'Guruvayur', tag: 'Temple town', line: 'Sri Krishna\u2019s temple, the spiritual heart of Kerala.', ph: 'Guruvayur temple' },
+        { key: 'trivandrum', name: 'Trivandrum', tag: 'Temple & coast', line: 'Sree Padmanabhaswamy Temple, then the shores of Kovalam.', ph: 'Padmanabhaswamy temple' }
+      ]
+    };
+    const fleet = [
+      { key: 'etios', name: 'Toyota Etios', cat: 'Sedan', f: 'sedan', seats: '4+1', bags: '2 bags', best: 'Couples & small families', note: 'Smooth and fuel-efficient for long highway days.', ph: 'Toyota Etios' },
+      { key: 'dzire', name: 'Maruti Dzire', cat: 'Sedan', f: 'sedan', seats: '4+1', bags: '2 bags', best: 'Airport & city transfers', note: 'Compact and easy in temple-town traffic.', ph: 'Maruti Dzire' },
+      { key: 'crysta', name: 'Innova Crysta', cat: 'Premium MUV', f: 'suv', seats: '7+1', bags: '3 bags', best: 'Family temple tours', note: 'Roomy captain seats, steady on ghat roads.', ph: 'Toyota Innova Crysta' },
+      { key: 'hycross', name: 'Innova Hycross', cat: 'Hybrid MUV', f: 'suv', seats: '7+1', bags: '3 bags', best: 'Quiet long drives', note: 'A refined, whisper-quiet hybrid for longer journeys.', ph: 'Toyota Innova Hycross' },
+      { key: 'tempo', name: 'Tempo Traveller', cat: 'Group van', f: 'van', seats: '12 / 17', bags: 'Roof carrier', best: 'Group pilgrimages', note: 'Push-back seats and headroom for big families.', ph: 'Force Tempo Traveller' },
+      { key: 'urbania', name: 'Force Urbania', cat: 'Premium van', f: 'van', seats: '10–17', bags: 'Rear boot', best: 'Premium group tours', note: 'Individual seats, big windows and a quiet cabin.', ph: 'Force Urbania' }
+    ].map((v, i) => ({ ...v, n: String(i + 1).padStart(2, '0'), wa: this.wa(`Vanakkam! I'd like to enquire about the ${v.name} for a trip.`) }));
+    const pk = [
+      { days: '5D', dur: '5 days · 4 nights', title: 'Divine Tamil Nadu', stops: ['Madurai', 'Rameswaram', 'Tiruchendur', 'Kanyakumari'], hl: 'Meenakshi Amman darshan, the Pamban bridge, shore temples and sunrise at land\u2019s end.' },
+      { days: '6D', dur: '6 days · 5 nights', title: 'Kerala Hills & Backwaters', stops: ['Munnar', 'Thekkady', 'Alleppey'], hl: 'Tea estates, a Periyar boat ride and a night aboard a houseboat.' },
+      { days: '4D', dur: '4 days · 3 nights', title: 'Southern Coast Pilgrimage', stops: ['Trivandrum', 'Suchindram', 'Kanyakumari', 'Tiruchendur'], hl: 'Padmanabhaswamy, Thanumalayan temple and the meeting of three seas.' },
+      { days: '4D', dur: '4 days · 3 nights', title: 'Kodai & Courtallam Retreat', stops: ['Madurai', 'Kodaikanal', 'Courtallam'], hl: 'Lake mornings, pine forests and a bath beneath the falls.' }
+    ];
+    const tab = (label, active, onClick, dark) => ({ label, onClick, bg: active ? (dark ? '#d9a23a' : '#2a1712') : 'transparent', fg: active ? '#2a1712' : (dark ? '#f1e9db' : '#2a1712') });
+    const fixTab = t => (t.bg === '#2a1712' ? { ...t, fg: '#f1e9db' } : t);
+    const list = dests[s.region], ad = Math.min(s.activeDest, list.length - 1);
+    const gal = [
+      { key: 1, ph: 'Gopuram at dusk', w: '420px', r: '210px 210px 0 0' }, { key: 2, ph: 'Houseboat on backwaters', w: '520px', r: '24px' },
+      { key: 3, ph: 'Tea hills in mist', w: '300px', r: '150px' }, { key: 4, ph: 'Temple oil lamps', w: '460px', r: '24px' },
+      { key: 5, ph: 'Kanyakumari sunrise', w: '380px', r: '190px 190px 0 0' }, { key: 6, ph: 'Courtallam falls', w: '320px', r: '24px' },
+      { key: 7, ph: 'Fleet on a ghat road', w: '540px', r: '24px' }, { key: 8, ph: 'Jasmine & kolam', w: '300px', r: '150px' },
+      { key: 9, ph: 'Elephant at temple festival', w: '440px', r: '220px 220px 0 0' }, { key: 10, ph: 'Spice market', w: '400px', r: '24px' }
+    ];
+    const scrollFleet = dir => { const t = this.trackRef.current; if (t) t.scrollBy({ left: dir * Math.min(404, t.clientWidth * .8), behavior: 'smooth' }); };
+    return {
+      rootRef: this.rootRef, overlayRef: this.overlayRef, progRef: this.progRef, heroImgRef: this.heroImgRef, trackRef: this.trackRef, badgeRef: this.badgeRef, dotRef: this.dotRef,
+      showOverlay: !s.introDone,
+      enterWithMusic: () => this.enter(true), enterQuiet: () => this.enter(false),
+      navBg: s.scrolled || s.menuOpen ? 'rgba(241,233,219,.88)' : 'transparent',
+      navShadow: s.scrolled ? '0 1px 0 rgba(42,23,18,.12)' : 'none',
+      navPad: s.scrolled ? '12px clamp(20px,5vw,72px)' : '26px clamp(20px,5vw,72px)',
+      wide: s.wide, narrow: !s.wide, menuOpen: s.menuOpen && !s.wide,
+      toggleMenu: () => this.setState(x => ({ menuOpen: !x.menuOpen })), closeMenu: () => this.setState({ menuOpen: false }),
+      menuLabel: s.menuOpen ? 'Close' : 'Menu',
+      navLeft: [['About', '#about'], ['Destinations', '#destinations'], ['Fleet', '#fleet']].map(([label, href]) => ({ label, href })),
+      navRight: [['Packages', '#packages'], ['Gallery', '#gallery'], ['Contact', '#contact']].map(([label, href]) => ({ label, href })),
+      navLinks: [['About', '#about'], ['Destinations', '#destinations'], ['Fleet', '#fleet'], ['Packages', '#packages'], ['Gallery', '#gallery'], ['Enquire', '#enquire'], ['Contact', '#contact']].map(([label, href]) => ({ label, href })),
+      toggleAudio: () => (s.playing ? this.stopAudio() : this.startAudio()),
+      waGeneral: this.wa('Vanakkam! I would like to plan a trip with Southern Heritage Tours & Travels.'),
+      petalsEl: React.createElement('canvas', { ref: this.canvasRef, style: { position: 'absolute', inset: 0, width: '100%', height: '100%' } }),
+      pillars: [
+        { t: 'Temple circuits', d: 'Darshan-timed routes across the great temples of the south.' },
+        { t: 'Hills & backwaters', d: 'Unhurried escapes to Munnar, Kodaikanal and Alleppey.' },
+        { t: 'Transfers', d: 'Airport and railway pickups, day or night.' }
+      ],
+      regionTabs: [tab('Tamil Nadu', s.region === 'tn', () => this.setState({ region: 'tn', activeDest: 0 }), true), tab('Kerala', s.region === 'kl', () => this.setState({ region: 'kl', activeDest: 0 }), true)],
+      destList: list.map((d, i) => ({ ...d, n: String(i + 1).padStart(2, '0'), onEnter: () => this.state.activeDest !== i && this.setState({ activeDest: i }),
+        op: i === ad ? 1 : .45, shift: i === ad ? '14px' : '0px', imgOp: i === ad ? 1 : 0, imgScale: i === ad ? 1 : 1.08, pe: i === ad ? 'auto' : 'none' })),
+      fleetTabs: [['All', 'all'], ['Sedans', 'sedan'], ['MUVs', 'suv'], ['Vans', 'van']].map(([l, k]) => fixTab(tab(l, s.fleetFilter === k, () => this.setState({ fleetFilter: k }), false))),
+      fleetList: fleet.filter(v => s.fleetFilter === 'all' || v.f === s.fleetFilter),
+      fleetPrev: () => scrollFleet(-1), fleetNext: () => scrollFleet(1),
+      packages: pk.map((p, i) => {
+        const open = s.openPkg === i;
+        return { ...p, open, bg: open ? '#2a1712' : '#f1e9db', fg: open ? '#f1e9db' : '#2a1712', numC: open ? '#d9a23a' : '#6e1f1a', rot: open ? '45deg' : '0deg',
+          toggle: () => this.setState(x => ({ openPkg: x.openPkg === i ? -1 : i })),
+          wa: this.wa(`Vanakkam! I'm interested in the "${p.title}" package (${p.dur}).`) };
+      }),
+      reasons: [
+        { n: 'i.', t: 'Drivers who know the temples', d: 'Darshan timings, dress codes, the right gate to enter by — all taken care of.' },
+        { n: 'ii.', t: 'Clean, well-kept vehicles', d: 'Every car cleaned before each trip and serviced on schedule.' },
+        { n: 'iii.', t: 'Clear, upfront pricing', d: 'A full quote before you travel, with tolls and permits listed.' },
+        { n: 'iv.', t: 'Always a message away', d: 'Reach us on WhatsApp at any hour, before or during your trip.' }
+      ],
+      quotes: [
+        { q: 'Our driver timed every darshan and still found us the quietest beach at Kanyakumari. My parents keep talking about it.', who: 'Lakshmi R.', trip: 'Chennai · Divine Tamil Nadu' },
+        { q: 'Spotless Crysta, calm driving on the Munnar ghats and never any rush. It felt like travelling with family.', who: 'Arun & family', trip: 'Bengaluru · Kerala Hills & Backwaters' },
+        { q: 'Seventeen of us in the Urbania and everything went perfectly — pickups, temple queues, food stops.', who: 'Meera N.', trip: 'Hyderabad · Group pilgrimage' }
+      ],
+      galleryA: gal.slice(0, 5), galleryB: gal.slice(5),
+      form: s.form,
+      onField: e => { const { name, value } = e.target; this.setState(x => ({ form: { ...x.form, [name]: value } })); },
+      submitForm: e => {
+        e.preventDefault(); const f = s.form;
+        const lines = ['Vanakkam! New trip enquiry:', f.name && `Name: ${f.name}`, f.phone && `Phone: ${f.phone}`, f.pickup && `Pickup: ${f.pickup}`,
+          f.dest && `Destination: ${f.dest}`, f.vehicle && `Vehicle: ${f.vehicle}`, f.date && `Date: ${f.date}`, f.pax && `Travellers: ${f.pax}`].filter(Boolean);
+        window.open(this.wa(lines.join('\n')), '_blank');
+      },
+      destNames: [...dests.tn, ...dests.kl].map(d => d.name),
+      vehicleNames: fleet.map(v => v.name),
+      contacts: [
+        { k: 'Phone', v: '+91 98000 00000', href: 'tel:+919800000000' },
+        { k: 'WhatsApp', v: 'Chat with us', href: this.wa('Vanakkam!') },
+        { k: 'Email', v: 'hello@southernheritage.in', href: 'mailto:hello@southernheritage.in' },
+        { k: 'Office', v: 'Madurai, Tamil Nadu', href: '#contact' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
