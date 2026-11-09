@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Manrope:wght@400;500;600&family=Noto+Serif+Tamil:wght@400&display=swap">
+<script src="./image-slot.js"></script>
+<style>
+html{scroll-behavior:smooth}
+body{margin:0;background:#0e1712;color:#f3ede0;font-family:Manrope,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#d6b26a;text-decoration:none}
+a:hover{color:#efd9a6}
+::selection{background:#d6b26a;color:#0e1712}
+input::placeholder{color:#7a7f74}
+:focus-visible{outline:1px solid #d6b26a;outline-offset:3px}
+</style>
+</helmet>
+<div ref="{{ rootRef }}" style="position:relative;background:#0e1712;color:#f3ede0;overflow-x:clip">
+
+<sc-if value="{{ showOverlay }}" hint-placeholder-val="{{ true }}">
+<div ref="{{ overlayRef }}" style="position:fixed;inset:0;z-index:100;background:#0b130f;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:28px;padding:32px;text-align:center">
+  <div data-intro="0" style="font-family:'Noto Serif Tamil',serif;font-size:18px;color:#d6b26a;letter-spacing:.08em">வணக்கம் · Vanakkam</div>
+  <div data-intro="1" style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(48px,9vw,120px);line-height:.95;letter-spacing:-.01em;color:#f3ede0">Southern <span style="font-style:italic;color:#d6b26a">Heritage</span></div>
+  <div data-intro="2" style="width:180px;height:1px;background:#d6b26a"></div>
+  <div data-intro="3" style="font-size:12px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:#b8b29f">Tours &amp; Travels · Tamil Nadu &amp; Kerala</div>
+  <div data-intro="4" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;margin-top:20px">
+    <button onClick="{{ enterWithMusic }}" style="background:#d6b26a;color:#0e1712;border:0;padding:17px 28px;font:600 12px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:#e8cb8c">Enter with music</button>
+    <button onClick="{{ enterQuiet }}" style="background:transparent;color:#f3ede0;border:1px solid rgba(243,237,224,.4);padding:17px 28px;font:600 12px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;white-space:nowrap" style-hover="background:rgba(243,237,224,.08)">Enter in silence</button>
+  </div>
+</div>
+</sc-if>
+
+<div ref="{{ progRef }}" style="position:fixed;top:0;left:0;right:0;height:2px;background:#d6b26a;transform-origin:0 50%;transform:scaleX(0);z-index:60"></div>
+
+<header style="position:fixed;top:0;left:0;right:0;z-index:50;display:flex;align-items:center;justify-content:space-between;gap:24px;padding:{{ navPad }};background:{{ navBg }};backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid {{ navLine }};transition:all .5s ease">
+  <a href="#top" style="display:flex;flex-direction:column;gap:2px;color:#f3ede0">
+    <span style="font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:400;line-height:1;letter-spacing:.01em">Southern <span style="font-style:italic;color:#d6b26a">Heritage</span></span>
+    <span style="font-size:9px;font-weight:600;letter-spacing:.42em;text-transform:uppercase;color:#b8b29f">Tours &amp; Travels</span>
+  </a>
+  <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+    <nav style="display:flex;gap:34px">
+      <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+        <a href="{{ l.href }}" style="color:#e4ddcc;font-size:13px;font-weight:500;letter-spacing:.06em" style-hover="color:#d6b26a">{{ l.label }}</a>
+      </sc-for>
+    </nav>
+  </sc-if>
+  <div style="display:flex;align-items:center;gap:18px">
+    <button onClick="{{ toggleAudio }}" aria-label="Toggle music" style="display:flex;align-items:center;gap:10px;background:transparent;border:0;color:#e4ddcc;cursor:pointer;font:600 11px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;padding:8px 0">
+      <span style="display:flex;align-items:flex-end;gap:3px;height:16px">
+        <span data-eq="1" style="width:2px;height:16px;background:#d6b26a;transform-origin:50% 100%;transform:scaleY(.25)"></span>
+        <span data-eq="2" style="width:2px;height:16px;background:#d6b26a;transform-origin:50% 100%;transform:scaleY(.25)"></span>
+        <span data-eq="3" style="width:2px;height:16px;background:#d6b26a;transform-origin:50% 100%;transform:scaleY(.25)"></span>
+        <span data-eq="4" style="width:2px;height:16px;background:#d6b26a;transform-origin:50% 100%;transform:scaleY(.25)"></span>
+      </span>
+      <span>{{ audioLabel }}</span>
+    </button>
+    <sc-if value="{{ wide }}" hint-placeholder-val="{{ true }}">
+      <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="background:#d6b26a;color:#0e1712;padding:13px 20px;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase" style-hover="background:#e8cb8c;color:#0e1712">WhatsApp</a>
+    </sc-if>
+    <sc-if value="{{ narrow }}" hint-placeholder-val="{{ false }}">
+      <button onClick="{{ toggleMenu }}" style="background:transparent;border:1px solid rgba(243,237,224,.35);color:#f3ede0;padding:10px 14px;font:600 11px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer">{{ menuLabel }}</button>
+    </sc-if>
+  </div>
+</header>
+
+<sc-if value="{{ menuOpen }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;inset:0;z-index:45;background:rgba(11,19,15,.97);display:flex;flex-direction:column;justify-content:center;gap:8px;padding:100px 32px 40px">
+    <sc-for list="{{ navLinks }}" as="l" hint-placeholder-count="6">
+      <a href="{{ l.href }}" onClick="{{ closeMenu }}" style="font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:300;color:#f3ede0;padding:6px 0;border-bottom:1px solid rgba(214,178,106,.18)">{{ l.label }}</a>
+    </sc-for>
+    <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="margin-top:28px;background:#d6b26a;color:#0e1712;padding:18px 22px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase">Enquire on WhatsApp</a>
+  </div>
+</sc-if>
+
+<section id="top" data-screen-label="Hero" style="position:relative;height:100vh;min-height:680px;overflow:hidden">
+  <div ref="{{ heroParRef }}" style="position:absolute;inset:-6% 0 -6% 0">
+    <div ref="{{ heroImgRef }}" style="position:absolute;inset:0">
+      <image-slot id="hero-main" shape="rect" placeholder="Hero: temple gopuram at dawn, or misty Western Ghats"></image-slot>
+    </div>
+  </div>
+  <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(14,23,18,.7) 0%,rgba(14,23,18,.2) 35%,rgba(14,23,18,.35) 60%,rgba(14,23,18,.95) 100%)"></div>
+  <div style="position:absolute;inset:0;pointer-events:none">{{ particlesEl }}</div>
+  <div style="position:absolute;left:0;right:0;bottom:0;padding:0 clamp(20px,5vw,72px) clamp(48px,8vh,96px);display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:40px;pointer-events:none">
+    <div style="max-width:980px;display:flex;flex-direction:column;gap:28px">
+      <div style="overflow:hidden"><div data-rise="0" style="display:flex;gap:16px;align-items:center;font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a"><span style="width:40px;height:1px;background:#d6b26a"></span>Tamil Nadu · Kerala</div></div>
+      <h1 style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(52px,8.4vw,136px);line-height:.92;letter-spacing:-.015em;color:#f3ede0">
+        <div style="overflow:hidden;padding-bottom:.06em"><div data-rise="1">Sacred shores,</div></div>
+        <div style="overflow:hidden;padding-bottom:.06em"><div data-rise="2" style="font-style:italic;color:#d6b26a">misted hills,</div></div>
+        <div style="overflow:hidden;padding-bottom:.06em"><div data-rise="3">unhurried roads.</div></div>
+      </h1>
+      <div style="overflow:hidden"><p data-rise="4" style="margin:0;max-width:520px;font-size:17px;line-height:1.65;color:#ddd6c4;text-wrap:pretty">Chauffeured journeys through the temple towns and green highlands of the deep south — from Madurai's gopurams to Munnar's tea slopes.</p></div>
+      <div style="overflow:hidden"><div data-rise="5" style="display:flex;gap:14px;flex-wrap:wrap;pointer-events:auto">
+        <a href="{{ waGeneral }}" target="_blank" rel="noopener" style="background:#d6b26a;color:#0e1712;padding:18px 28px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase" style-hover="background:#e8cb8c;color:#0e1712">Plan on WhatsApp</a>
+        <a href="#fleet" style="border:1px solid rgba(243,237,224,.45);color:#f3ede0;padding:18px 28px;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase" style-hover="background:rgba(243,237,224,.1);color:#f3ede0">View our fleet</a>
+      </div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+      <span style="font-family:'Noto Serif Tamil',serif;font-size:14px;color:#d6b26a;writing-mode:vertical-rl;letter-spacing:.1em">தென்னக பாரம்பரியம்</span>
+      <div style="width:1px;height:70px;background:rgba(243,237,224,.2);overflow:hidden;position:relative"><div ref="{{ scrollCueRef }}" style="position:absolute;left:0;top:0;width:1px;height:28px;background:#d6b26a"></div></div>
+    </div>
+  </div>
+</section>
+
+<div style="border-top:1px solid rgba(214,178,106,.2);border-bottom:1px solid rgba(214,178,106,.2);overflow:hidden;padding:26px 0;background:#0e1712">
+  <div ref="{{ marqRef }}" style="display:flex;width:max-content;gap:48px;align-items:center">
+    <sc-for list="{{ marquee }}" as="m" hint-placeholder-count="12">
+      <div style="display:flex;align-items:center;gap:48px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(28px,3.4vw,44px);font-weight:300;color:#e4ddcc;white-space:nowrap">{{ m }}<span style="width:7px;height:7px;background:#d6b26a;transform:rotate(45deg)"></span></div>
+    </sc-for>
+  </div>
+</div>
+
+<section id="about" data-screen-label="About" style="background:#f3ede0;color:#1b241e;padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,440px),1fr));gap:clamp(48px,7vw,110px);align-items:center">
+    <div data-reveal="" style="position:relative;padding:0 12% 18% 0">
+      <div style="aspect-ratio:4/5;width:100%"><image-slot id="about-a" shape="rect" placeholder="Temple corridor / pillared mandapam"></image-slot></div>
+      <div style="position:absolute;right:0;bottom:0;width:48%;aspect-ratio:3/4;border:10px solid #f3ede0"><image-slot id="about-b" shape="rect" placeholder="Backwaters / tea estate"></image-slot></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:30px">
+      <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#7a5c22">01 — About us</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02;letter-spacing:-.01em">Rooted in the south. <span style="font-style:italic;color:#7a5c22">Devoted to the journey.</span></h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:17px;line-height:1.75;color:#4a5149;max-width:560px;text-wrap:pretty">Southern Heritage Tours &amp; Travels takes families, pilgrims and travellers across southern Tamil Nadu and Kerala. Our drivers know the darshan timings, the quiet ghat roads and the best place to stop for filter coffee. You get there calm, on time, and with room to take it all in.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));border-top:1px solid rgba(27,36,30,.2);margin-top:10px">
+        <sc-for list="{{ pillars }}" as="p" hint-placeholder-count="3">
+          <div data-reveal="" style="padding:24px 20px 0 0;display:flex;flex-direction:column;gap:8px">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:26px;font-style:italic;color:#7a5c22">{{ p.n }}</span>
+            <span style="font-size:15px;font-weight:600">{{ p.t }}</span>
+            <span style="font-size:14px;line-height:1.6;color:#4f564f">{{ p.d }}</span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="destinations" data-screen-label="Destinations" style="padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px);background:#0e1712">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:24px;max-width:720px">
+        <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a">02 — Destinations</div>
+        <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Where the gods live <span style="font-style:italic;color:#d6b26a">&amp; the mist settles.</span></h2>
+      </div>
+      <div data-reveal="" data-delay="200" style="display:flex;border:1px solid rgba(214,178,106,.4)">
+        <sc-for list="{{ regionTabs }}" as="t" hint-placeholder-count="2">
+          <button onClick="{{ t.onClick }}" style="background:{{ t.bg }};color:{{ t.fg }};border:0;padding:15px 24px;font:600 12px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .4s">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:20px">
+      <sc-for list="{{ destList }}" as="d" hint-placeholder-count="6">
+        <article data-dest="" data-reveal="" style="position:relative;height:460px;overflow:hidden;background:#142019;transition:transform .6s cubic-bezier(.2,.7,.1,1)" style-hover="transform:translateY(-6px)">
+          <image-slot id="dest-{{ d.key }}" shape="rect" placeholder="{{ d.ph }}"></image-slot>
+          <div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(14,23,18,0) 35%,rgba(14,23,18,.92) 100%)"></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:28px;display:flex;flex-direction:column;gap:10px;pointer-events:none">
+            <span style="align-self:flex-start;font-size:10px;font-weight:600;letter-spacing:.28em;text-transform:uppercase;color:#d6b26a;border:1px solid rgba(214,178,106,.5);padding:6px 10px">{{ d.tag }}</span>
+            <h3 style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:40px;line-height:1">{{ d.name }}</h3>
+            <p style="margin:0;font-size:14px;line-height:1.6;color:#ddd6c4;text-wrap:pretty">{{ d.line }}</p>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="fleet" data-screen-label="Fleet" style="background:#f3ede0;color:#1b241e;padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:32px">
+      <div style="display:flex;flex-direction:column;gap:24px;max-width:720px">
+        <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#7a5c22">03 — Our fleet</div>
+        <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Six ways to travel <span style="font-style:italic;color:#7a5c22">in comfort.</span></h2>
+        <p data-reveal="" data-delay="200" style="margin:0;font-size:16px;line-height:1.7;color:#4a5149;max-width:520px">Every vehicle is air-conditioned, cleaned before each trip, and driven by a professional who knows the region.</p>
+      </div>
+      <div data-reveal="" data-delay="200" style="display:flex;flex-wrap:wrap;border:1px solid rgba(27,36,30,.3)">
+        <sc-for list="{{ fleetTabs }}" as="t" hint-placeholder-count="4">
+          <button onClick="{{ t.onClick }}" style="background:{{ t.bg }};color:{{ t.fg }};border:0;padding:15px 22px;font:600 12px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;transition:all .4s">{{ t.label }}</button>
+        </sc-for>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,380px),1fr));gap:1px;background:rgba(27,36,30,.18);border:1px solid rgba(27,36,30,.18)">
+      <sc-for list="{{ fleetList }}" as="v" hint-placeholder-count="6">
+        <article data-fleet="" data-reveal="" style="background:#f3ede0;display:flex;flex-direction:column;transition:background .5s" style-hover="background:#ece4d3">
+          <div style="aspect-ratio:16/10;position:relative;overflow:hidden"><image-slot id="fleet-{{ v.key }}" shape="rect" placeholder="{{ v.ph }}"></image-slot></div>
+          <div style="padding:30px 30px 34px;display:flex;flex-direction:column;gap:22px;flex:1">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px">
+              <h3 style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:36px;line-height:1">{{ v.name }}</h3>
+              <span style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:#7a5c22">{{ v.n }}</span>
+            </div>
+            <div style="font-size:11px;font-weight:600;letter-spacing:.26em;text-transform:uppercase;color:#7a5c22">{{ v.cat }}</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1.3fr;border-top:1px solid rgba(27,36,30,.18);border-bottom:1px solid rgba(27,36,30,.18)">
+              <div style="padding:14px 10px 14px 0;display:flex;flex-direction:column;gap:4px"><span style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5b6259">Seats</span><span style="font-size:15px;font-weight:600">{{ v.seats }}</span></div>
+              <div style="padding:14px 10px;display:flex;flex-direction:column;gap:4px;border-left:1px solid rgba(27,36,30,.18)"><span style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5b6259">Luggage</span><span style="font-size:15px;font-weight:600">{{ v.bags }}</span></div>
+              <div style="padding:14px 0 14px 10px;display:flex;flex-direction:column;gap:4px;border-left:1px solid rgba(27,36,30,.18)"><span style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#5b6259">Best for</span><span style="font-size:14px;font-weight:600;line-height:1.35">{{ v.best }}</span></div>
+            </div>
+            <p style="margin:0;font-size:14px;line-height:1.65;color:#4a5149;flex:1">{{ v.note }}</p>
+            <a href="{{ v.wa }}" target="_blank" rel="noopener" style="align-self:flex-start;display:flex;gap:12px;align-items:center;color:#1b241e;font-size:12px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;border-bottom:1px solid #7a5c22;padding-bottom:6px" style-hover="color:#7a5c22">Enquire on WhatsApp <span>→</span></a>
+          </div>
+        </article>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="packages" data-screen-label="Packages" style="padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px);background:#0e1712">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;gap:24px;max-width:760px">
+      <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a">04 — Tour packages</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Itineraries, <span style="font-style:italic;color:#d6b26a">gently paced.</span></h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:16px;line-height:1.7;color:#c9c2b0;max-width:540px">Starting points to shape your trip around. We can change any of them — add a day, a temple or a detour.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;border-top:1px solid rgba(214,178,106,.3)">
+      <sc-for list="{{ packages }}" as="p" hint-placeholder-count="4">
+        <div data-reveal="" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:24px 40px;align-items:center;padding:40px 0;border-bottom:1px solid rgba(214,178,106,.3);transition:padding .5s,background .5s" style-hover="background:rgba(214,178,106,.05);padding:40px 24px">
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <span style="font-family:'Cormorant Garamond',serif;font-size:54px;font-weight:300;line-height:1;color:#d6b26a">{{ p.days }}</span>
+            <span style="font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#b8b29f">{{ p.dur }}</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;grid-column:span 2">
+            <h3 style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:400;font-size:34px;line-height:1.05">{{ p.title }}</h3>
+            <span style="font-size:14px;letter-spacing:.04em;color:#d6b26a">{{ p.route }}</span>
+            <span style="font-size:14px;line-height:1.6;color:#c9c2b0">{{ p.hl }}</span>
+          </div>
+          <a href="{{ p.wa }}" target="_blank" rel="noopener" style="justify-self:start;border:1px solid rgba(214,178,106,.6);color:#f3ede0;padding:16px 22px;font-size:11px;font-weight:600;letter-spacing:.2em;text-transform:uppercase" style-hover="background:#d6b26a;color:#0e1712">Enquire →</a>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Why us" style="background:#f3ede0;color:#1b241e;padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-direction:column;gap:24px;max-width:760px">
+      <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#7a5c22">05 — Why travel with us</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Small details, <span style="font-style:italic;color:#7a5c22">taken care of.</span></h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr));border-top:1px solid rgba(27,36,30,.25)">
+      <sc-for list="{{ reasons }}" as="r" hint-placeholder-count="4">
+        <div data-reveal="" style="padding:36px 32px 12px 0;display:flex;flex-direction:column;gap:16px">
+          <span style="font-family:'Cormorant Garamond',serif;font-size:64px;font-weight:300;line-height:1;color:#7a5c22">{{ r.n }}</span>
+          <h3 style="margin:0;font-size:18px;font-weight:600;line-height:1.35">{{ r.t }}</h3>
+          <p style="margin:0;font-size:15px;line-height:1.7;color:#4a5149;text-wrap:pretty">{{ r.d }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="Testimonials" style="padding:clamp(90px,13vw,170px) clamp(20px,5vw,72px);background:#142019;position:relative;overflow:hidden">
+  <div style="max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:44px">
+    <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a">06 — Traveller stories</div>
+    <div ref="{{ quoteRef }}" style="display:flex;flex-direction:column;gap:36px;min-height:320px">
+      <blockquote style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(30px,3.8vw,54px);line-height:1.18;color:#f3ede0;text-wrap:pretty">“{{ quote.q }}”</blockquote>
+      <div style="display:flex;gap:16px;align-items:center"><span style="width:40px;height:1px;background:#d6b26a"></span><span style="font-size:14px;font-weight:600;letter-spacing:.06em">{{ quote.who }}</span><span style="font-size:13px;color:#b8b29f">{{ quote.trip }}</span></div>
+    </div>
+    <div style="display:flex;gap:12px">
+      <sc-for list="{{ quoteDots }}" as="d" hint-placeholder-count="3">
+        <button onClick="{{ d.onClick }}" aria-label="Show story" style="width:{{ d.w }};height:2px;border:0;padding:0;background:{{ d.bg }};cursor:pointer;transition:all .6s"></button>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="gallery" data-screen-label="Gallery" style="padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px);background:#0e1712">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-direction:column;gap:56px">
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:24px">
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a">07 — Gallery</div>
+        <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Seen <span style="font-style:italic;color:#d6b26a">along the way.</span></h2>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));grid-auto-rows:220px;grid-auto-flow:dense;gap:16px">
+      <sc-for list="{{ gallery }}" as="g" hint-placeholder-count="8">
+        <div data-reveal="" style="position:relative;overflow:hidden;grid-row:span {{ g.rs }};grid-column:span {{ g.cs }};background:#142019"><image-slot id="gal-{{ g.key }}" shape="rect" placeholder="{{ g.ph }}"></image-slot></div>
+      </sc-for>
+    </div>
+  </div>
+</section>
+
+<section id="enquire" data-screen-label="Enquiry" style="background:#f3ede0;color:#1b241e;padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px)">
+  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(48px,7vw,110px)">
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#7a5c22">08 — Enquire</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Tell us where <span style="font-style:italic;color:#7a5c22">your heart is set.</span></h2>
+      <p data-reveal="" data-delay="200" style="margin:0;font-size:16px;line-height:1.7;color:#4a5149;max-width:460px">Fill in what you know. Your details open in WhatsApp, ready to send, and we usually reply within the hour.</p>
+    </div>
+    <form onSubmit="{{ submitForm }}" data-reveal="" data-delay="150" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,220px),1fr));gap:30px 28px">
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Your name<input name="name" value="{{ form.name }}" onChange="{{ onField }}" required="" placeholder="Full name" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Phone<input name="phone" type="tel" value="{{ form.phone }}" onChange="{{ onField }}" placeholder="+91" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Pickup city<input name="pickup" value="{{ form.pickup }}" onChange="{{ onField }}" placeholder="e.g. Madurai airport" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Destination<select name="dest" value="{{ form.dest }}" onChange="{{ onField }}" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none;border-radius:0">
+        <option value="">Choose one</option>
+        <sc-for list="{{ destNames }}" as="o" hint-placeholder-count="11"><option value="{{ o }}">{{ o }}</option></sc-for>
+      </select></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Vehicle<select name="vehicle" value="{{ form.vehicle }}" onChange="{{ onField }}" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none;border-radius:0">
+        <option value="">Not sure yet</option>
+        <sc-for list="{{ vehicleNames }}" as="o" hint-placeholder-count="6"><option value="{{ o }}">{{ o }}</option></sc-for>
+      </select></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Travel date<input name="date" type="date" value="{{ form.date }}" onChange="{{ onField }}" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none"></label>
+      <label style="display:flex;flex-direction:column;gap:10px;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:#5b6259">Travellers<input name="pax" type="number" min="1" value="{{ form.pax }}" onChange="{{ onField }}" placeholder="How many?" style="font:400 17px Manrope,sans-serif;letter-spacing:0;text-transform:none;color:#1b241e;background:transparent;border:0;border-bottom:1px solid rgba(27,36,30,.35);padding:10px 0;outline:none"></label>
+      <div style="display:flex;align-items:flex-end">
+        <button type="submit" style="width:100%;background:#1b241e;color:#f3ede0;border:0;padding:20px 26px;font:600 12px Manrope,sans-serif;letter-spacing:.2em;text-transform:uppercase;cursor:pointer;text-align:left;display:flex;justify-content:space-between" style-hover="background:#7a5c22">Send on WhatsApp <span>→</span></button>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="Contact" style="padding:clamp(80px,12vw,160px) clamp(20px,5vw,72px) 0;background:#0e1712">
+  <div style="max-width:1320px;margin:0 auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:clamp(40px,6vw,90px)">
+    <div style="display:flex;flex-direction:column;gap:36px">
+      <div data-reveal="" style="font-size:12px;font-weight:600;letter-spacing:.32em;text-transform:uppercase;color:#d6b26a">09 — Contact</div>
+      <h2 data-reveal="" data-delay="100" style="margin:0;font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(40px,5vw,72px);line-height:1.02">Find us in <span style="font-style:italic;color:#d6b26a">Madurai.</span></h2>
+      <div style="display:flex;flex-direction:column;border-top:1px solid rgba(214,178,106,.3)">
+        <sc-for list="{{ contacts }}" as="c" hint-placeholder-count="4">
+          <a data-reveal="" href="{{ c.href }}" style="display:flex;justify-content:space-between;gap:20px;padding:22px 0;border-bottom:1px solid rgba(214,178,106,.3);color:#f3ede0" style-hover="color:#d6b26a">
+            <span style="font-size:11px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:#b8b29f">{{ c.k }}</span>
+            <span style="font-size:17px;text-align:right">{{ c.v }}</span>
+          </a>
+        </sc-for>
+      </div>
+    </div>
+    <div data-reveal="" data-delay="150" style="min-height:440px;position:relative;border:1px solid rgba(214,178,106,.3)">
+      <iframe title="Map" src="https://maps.google.com/maps?q=Madurai%2C%20Tamil%20Nadu&amp;z=7&amp;output=embed" loading="lazy" style="position:absolute;inset:0;width:100%;height:100%;border:0;filter:grayscale(.5) sepia(.25) brightness(.85) contrast(1.05)"></iframe>
+    </div>
+  </div>
+  <footer style="max-width:1320px;margin:0 auto;padding:clamp(80px,10vw,140px) 0 40px;display:flex;flex-direction:column;gap:40px">
+    <div data-reveal="" style="font-family:'Cormorant Garamond',serif;font-weight:300;font-size:clamp(56px,11.5vw,190px);line-height:.9;letter-spacing:-.02em;color:#f3ede0">Southern <span style="font-style:italic;color:#d6b26a">Heritage</span></div>
+    <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:20px;padding-top:28px;border-top:1px solid rgba(214,178,106,.3);font-size:13px;color:#b8b29f">
+      <span>© 2026 Southern Heritage Tours &amp; Travels</span>
+      <span style="font-family:'Noto Serif Tamil',serif">தமிழ்நாடு · കേരളം</span>
+      <a href="#top">Back to top ↑</a>
+    </div>
+  </footer>
+</section>
+
+<a ref="{{ waRef }}" href="{{ waGeneral }}" target="_blank" rel="noopener" aria-label="WhatsApp" style="position:fixed;right:24px;bottom:24px;z-index:40;width:64px;height:64px;border-radius:50%;background:#d6b26a;color:#0e1712;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;box-shadow:0 12px 30px rgba(0,0,0,.35)" style-hover="background:#e8cb8c;color:#0e1712">
+  <span data-ring="" style="position:absolute;inset:0;border-radius:50%;border:1px solid #d6b26a;pointer-events:none"></span>Chat
+</a>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;whatsappNumber&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;919800000000&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Contact&quot;},&quot;showIntro&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;particles&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Motion&quot;},&quot;musicVolume&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:0.6,&quot;min&quot;:0,&quot;max&quot;:1,&quot;step&quot;:0.05,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Audio&quot;}}">
+class Component extends DCLogic {
+  state = { introDone: false, playing: false, scrolled: false, wide: true, menuOpen: false, region: 'tn', fleetFilter: 'all', tIdx: 0,
+    form: { name: '', phone: '', pickup: '', dest: '', vehicle: '', date: '', pax: '' } };
+  rootRef = React.createRef(); overlayRef = React.createRef(); progRef = React.createRef(); heroParRef = React.createRef();
+  heroImgRef = React.createRef(); marqRef = React.createRef(); canvasRef = React.createRef(); quoteRef = React.createRef();
+  waRef = React.createRef(); scrollCueRef = React.createRef();
+  ease = 'cubic-bezier(.2,.7,.1,1)';
+
+  wa(msg) { const n = (this.props.whatsappNumber ?? '919800000000').replace(/\D/g, ''); return `https://wa.me/${n}?text=${encodeURIComponent(msg)}`; }
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const root = this.rootRef.current;
+    this.onScroll = () => {
+      const y = window.scrollY, h = document.documentElement.scrollHeight - innerHeight;
+      if (this.progRef.current) this.progRef.current.style.transform = `scaleX(${h > 0 ? y / h : 0})`;
+      if (this.heroParRef.current && y < innerHeight * 1.2) this.heroParRef.current.style.transform = `translateY(${y * 0.3}px)`;
+      const s = y > 40; if (s !== this.state.scrolled) this.setState({ scrolled: s });
+    };
+    this.onResize = () => { const w = innerWidth >= 960; if (w !== this.state.wide) this.setState({ wide: w, menuOpen: false }); };
+    addEventListener('scroll', this.onScroll, { passive: true }); addEventListener('resize', this.onResize);
+    this.onResize(); this.onScroll();
+
+    root.querySelectorAll('[data-rise]').forEach(el => { el.style.transform = 'translateY(110%)'; });
+    this.io = new IntersectionObserver(es => es.forEach(e => {
+      if (!e.isIntersecting) return; const el = e.target; this.io.unobserve(el);
+      el.animate([{ opacity: 0, transform: 'translateY(48px)', filter: 'blur(8px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }],
+        { duration: this.reduced ? 1 : 1400, delay: +(el.dataset.delay || 0), easing: this.ease, fill: 'forwards' });
+    }), { threshold: 0.12, rootMargin: '0px 0px -6% 0px' });
+    root.querySelectorAll('[data-reveal]').forEach(el => { el.style.opacity = '0'; this.io.observe(el); });
+
+    if (this.marqRef.current) this.marqRef.current.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(-50%)' }], { duration: 60000, iterations: Infinity });
+    if (this.scrollCueRef.current) this.scrollCueRef.current.animate([{ transform: 'translateY(-30px)' }, { transform: 'translateY(75px)' }], { duration: 2200, iterations: Infinity, easing: 'ease-in-out' });
+    const ring = this.waRef.current && this.waRef.current.querySelector('[data-ring]');
+    if (ring) ring.animate([{ transform: 'scale(1)', opacity: .9 }, { transform: 'scale(1.7)', opacity: 0 }], { duration: 2400, iterations: Infinity, easing: 'ease-out' });
+
+    if ((this.props.particles ?? true) && !this.reduced) this.startParticles();
+    if (this.props.showIntro ?? true) this.playIntro(); else { this.setState({ introDone: true }); this.playHero(0); }
+    this.tTimer = setInterval(() => this.goQuote((this.state.tIdx + 1) % 3), 8000);
+  }
+
+  componentWillUnmount() {
+    removeEventListener('scroll', this.onScroll); removeEventListener('resize', this.onResize);
+    this.io && this.io.disconnect(); this.ro && this.ro.disconnect(); cancelAnimationFrame(this.raf);
+    clearInterval(this.tTimer); clearInterval(this.audioTimer); this.ac && this.ac.close();
+  }
+
+  componentDidUpdate() {
+    const root = this.rootRef.current; if (!root) return;
+    const ps = this._prev || this.state;
+    this._prev = { region: this.state.region, fleetFilter: this.state.fleetFilter, playing: this.state.playing, tIdx: this.state.tIdx };
+    if (ps.region !== this.state.region) this.stagger(root.querySelectorAll('[data-dest]'));
+    if (ps.fleetFilter !== this.state.fleetFilter) this.stagger(root.querySelectorAll('[data-fleet]'));
+    if (ps.playing !== this.state.playing) this.animEq(this.state.playing);
+    if (ps.tIdx !== this.state.tIdx && this.quoteRef.current)
+      this.quoteRef.current.animate([{ opacity: 0, transform: 'translateY(24px)', filter: 'blur(6px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }], { duration: 1200, easing: this.ease });
+  }
+
+  stagger(nodes) {
+    nodes.forEach((el, i) => el.animate([{ opacity: 0, transform: 'translateY(40px) scale(.98)' }, { opacity: 1, transform: 'none' }],
+      { duration: 900, delay: i * 80, easing: this.ease, fill: 'both' }));
+  }
+
+  animEq(on) {
+    const bars = this.rootRef.current.querySelectorAll('[data-eq]');
+    (this.eqAnims || []).forEach(a => a.cancel()); this.eqAnims = [];
+    if (!on) return;
+    bars.forEach((b, i) => this.eqAnims.push(b.animate([{ transform: 'scaleY(.25)' }, { transform: 'scaleY(1)' }, { transform: 'scaleY(.4)' }, { transform: 'scaleY(.8)' }, { transform: 'scaleY(.25)' }],
+      { duration: 1100 + i * 230, iterations: Infinity, easing: 'ease-in-out' })));
+  }
+
+  playIntro() {
+    const o = this.overlayRef.current; if (!o) return;
+    o.querySelectorAll('[data-intro]').forEach(el => {
+      const i = +el.dataset.intro;
+      const kf = i === 2 ? [{ transform: 'scaleX(0)' }, { transform: 'scaleX(1)' }] : [{ opacity: 0, transform: 'translateY(30px)', filter: 'blur(10px)' }, { opacity: 1, transform: 'none', filter: 'blur(0)' }];
+      el.animate(kf, { duration: 1600, delay: 300 + i * 450, easing: this.ease, fill: 'both' });
+    });
+  }
+
+  enter(music) {
+    if (music) this.startAudio();
+    const o = this.overlayRef.current;
+    this.playHero(700);
+    if (!o) return this.setState({ introDone: true });
+    const a = o.animate([{ clipPath: 'inset(0 0 0 0)' }, { clipPath: 'inset(0 0 100% 0)' }], { duration: 1500, easing: 'cubic-bezier(.7,0,.2,1)', fill: 'forwards' });
+    a.onfinish = () => this.setState({ introDone: true });
+  }
+
+  playHero(delay) {
+    const root = this.rootRef.current;
+    root.querySelectorAll('[data-rise]').forEach(el => el.animate([{ transform: 'translateY(110%)' }, { transform: 'translateY(0)' }],
+      { duration: 1500, delay: delay + 200 + (+el.dataset.rise) * 140, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'forwards' }));
+    const img = this.heroImgRef.current;
+    if (img && !this.reduced) {
+      img.animate([{ transform: 'scale(1.18)', filter: 'brightness(.4)' }, { transform: 'scale(1.04)', filter: 'brightness(1)' }], { duration: 3200, delay, easing: 'cubic-bezier(.16,1,.3,1)', fill: 'both' })
+        .onfinish = () => img.animate([{ transform: 'scale(1.04)' }, { transform: 'scale(1.12) translateX(-1.5%)' }], { duration: 38000, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' });
+    }
+  }
+
+  startParticles() {
+    const c = this.canvasRef.current; if (!c) return;
+    const ctx = c.getContext('2d'); let W = 0, H = 0;
+    const fit = () => { const r = c.parentElement.getBoundingClientRect(), d = Math.min(devicePixelRatio || 1, 2); W = r.width; H = r.height; c.width = W * d; c.height = H * d; ctx.setTransform(d, 0, 0, d, 0, 0); };
+    fit(); this.ro = new ResizeObserver(fit); this.ro.observe(c.parentElement);
+    const ps = Array.from({ length: 70 }, () => ({ x: Math.random(), y: Math.random(), r: .6 + Math.random() * 1.8, s: .00002 + Math.random() * .00006, ph: Math.random() * 6.28 }));
+    let last = performance.now();
+    const loop = t => {
+      const dt = Math.min(t - last, 50); last = t;
+      ctx.clearRect(0, 0, W, H); ctx.globalCompositeOperation = 'lighter';
+      for (const p of ps) {
+        p.y -= p.s * dt; if (p.y < -.05) { p.y = 1.05; p.x = Math.random(); }
+        const x = (p.x + Math.sin(t * .0003 + p.ph) * .02) * W, y = p.y * H;
+        const a = .15 + .6 * (.5 + .5 * Math.sin(t * .0018 + p.ph * 3)), R = p.r * 7;
+        const g = ctx.createRadialGradient(x, y, 0, x, y, R);
+        g.addColorStop(0, `rgba(240,205,130,${a})`); g.addColorStop(.25, `rgba(214,178,106,${a * .45})`); g.addColorStop(1, 'rgba(214,178,106,0)');
+        ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, R, 0, 6.283); ctx.fill();
+      }
+      this.raf = requestAnimationFrame(loop);
+    };
+    this.raf = requestAnimationFrame(loop);
+  }
+
+  // ---- Procedural veena-like drone + bansuri melody (raga Mohanam) ----
+  buildAudio() {
+    const ac = this.ac = new (window.AudioContext || window.webkitAudioContext)();
+    this.master = ac.createGain(); this.master.gain.value = 0; this.master.connect(ac.destination);
+    const len = ac.sampleRate * 4, ir = ac.createBuffer(2, len, ac.sampleRate);
+    for (let ch = 0; ch < 2; ch++) { const d = ir.getChannelData(ch); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, 3); }
+    const rev = ac.createConvolver(); rev.buffer = ir; const wet = ac.createGain(); wet.gain.value = .55; rev.connect(wet); wet.connect(this.master);
+    this.bus = ac.createGain(); this.bus.connect(this.master); this.bus.connect(rev);
+    const nb = ac.createBuffer(1, ac.sampleRate * 2, ac.sampleRate), nd = nb.getChannelData(0); for (let i = 0; i < nd.length; i++) nd[i] = Math.random() * 2 - 1;
+    this.noise = nb; this.sa = 138.59; this.nextPluck = ac.currentTime + .1; this.pluckIdx = 0; this.nextPhrase = ac.currentTime + 2.5; this.deg = 0;
+  }
+  pluck(f, t, amp) {
+    const ac = this.ac;
+    for (let h = 1; h <= 7; h++) {
+      const o = ac.createOscillator(), g = ac.createGain();
+      o.frequency.value = f * h * (1 + (Math.random() - .5) * .002);
+      const pk = amp * .07 / Math.pow(h, .8), dec = 4.5 / Math.sqrt(h);
+      g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(pk, t + .015); g.gain.exponentialRampToValueAtTime(.0001, t + dec);
+      o.connect(g); g.connect(this.bus); o.start(t); o.stop(t + dec + .1);
+    }
+  }
+  phrase(t0) {
+    const ac = this.ac, ratios = [1, 9 / 8, 5 / 4, 3 / 2, 5 / 3];
+    const fOf = d => { const oct = Math.floor(d / 5), i = ((d % 5) + 5) % 5; return this.sa * 4 * ratios[i] * Math.pow(2, oct); };
+    const n = 3 + Math.floor(Math.random() * 5), durs = [.45, .7, .9, 1.2, 1.8];
+    const o = ac.createOscillator(), o2 = ac.createOscillator(), g = ac.createGain(), g2 = ac.createGain(), lp = ac.createBiquadFilter();
+    o.type = 'sine'; o2.type = 'triangle'; g2.gain.value = .18; lp.type = 'lowpass'; lp.frequency.value = 2600;
+    const lfo = ac.createOscillator(), lg = ac.createGain(); lfo.frequency.value = 5.2; lg.gain.setValueAtTime(0, t0); lg.gain.linearRampToValueAtTime(4, t0 + 1);
+    lfo.connect(lg); lg.connect(o.frequency); lg.connect(o2.frequency);
+    o.connect(g); o2.connect(g2); g2.connect(g); g.connect(lp); lp.connect(this.bus);
+    let t = t0, f = fOf(this.deg);
+    o.frequency.setValueAtTime(f, t); o2.frequency.setValueAtTime(f, t);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.07, t + .25);
+    for (let k = 0; k < n; k++) {
+      const d = durs[Math.floor(Math.random() * durs.length)];
+      if (k > 0) {
+        this.deg = Math.max(-1, Math.min(8, this.deg + [-2, -1, -1, 1, 1, 2][Math.floor(Math.random() * 6)]));
+        f = fOf(this.deg); o.frequency.setTargetAtTime(f, t, .05); o2.frequency.setTargetAtTime(f, t, .05);
+        g.gain.setTargetAtTime(.06 + Math.random() * .025, t, .1);
+      }
+      t += d;
+    }
+    t += .6; g.gain.setTargetAtTime(0, t - .5, .25);
+    const br = ac.createBufferSource(), bf = ac.createBiquadFilter(), bg = ac.createGain();
+    br.buffer = this.noise; br.loop = true; bf.type = 'bandpass'; bf.frequency.value = 1800; bf.Q.value = .8;
+    bg.gain.setValueAtTime(0, t0); bg.gain.linearRampToValueAtTime(.012, t0 + .2); bg.gain.setTargetAtTime(0, t - .5, .25);
+    br.connect(bf); bf.connect(bg); bg.connect(this.bus);
+    [o, o2, lfo, br].forEach(s => { s.start(t0); s.stop(t + 1.5); });
+    if (Math.random() < .3) this.deg = 0;
+    return t;
+  }
+  schedule() {
+    const ac = this.ac, ahead = ac.currentTime + .6;
+    const pat = [[this.sa * .75, .9], [this.sa, .7], [this.sa, .7], [this.sa * .5, 1]];
+    while (this.nextPluck < ahead) { const [f, a] = pat[this.pluckIdx % 4]; this.pluck(f, this.nextPluck, a); this.pluckIdx++; this.nextPluck += this.pluckIdx % 4 === 0 ? 1.6 : 1.05; }
+    if (this.nextPhrase < ahead) { const end = this.phrase(this.nextPhrase); this.nextPhrase = end + 1.5 + Math.random() * 3; }
+  }
+  startAudio() {
+    try {
+      if (!this.ac) this.buildAudio();
+      this.ac.resume(); const now = this.ac.currentTime, vol = this.props.musicVolume ?? .6;
+      this.nextPluck = Math.max(this.nextPluck, now + .05); this.nextPhrase = Math.max(this.nextPhrase, now + 2);
+      this.master.gain.cancelScheduledValues(now); this.master.gain.setValueAtTime(this.master.gain.value, now); this.master.gain.linearRampToValueAtTime(vol, now + 2.5);
+      clearInterval(this.audioTimer); this.audioTimer = setInterval(() => this.schedule(), 120); this.schedule();
+      this.setState({ playing: true });
+    } catch (e) { console.warn('Audio unavailable', e); }
+  }
+  stopAudio() {
+    if (!this.ac) return; const now = this.ac.currentTime;
+    this.master.gain.cancelScheduledValues(now); this.master.gain.setValueAtTime(this.master.gain.value, now); this.master.gain.linearRampToValueAtTime(0, now + 1.2);
+    clearInterval(this.audioTimer); setTimeout(() => { if (!this.state.playing) this.ac.suspend(); }, 1400);
+    this.setState({ playing: false });
+  }
+
+  goQuote(i) { this.setState({ tIdx: i }); clearInterval(this.tTimer); this.tTimer = setInterval(() => this.goQuote((this.state.tIdx + 1) % 3), 8000); }
+
+  renderVals() {
+    const s = this.state;
+    const dests = {
+      tn: [
+        { key: 'madurai', name: 'Madurai', tag: 'Temple city', line: 'Meenakshi Amman Temple and its towering gopurams — the city that never sleeps.', ph: 'Meenakshi Amman gopuram' },
+        { key: 'rameswaram', name: 'Rameswaram', tag: 'Island pilgrimage', line: 'Ramanathaswamy\u2019s endless pillared corridors and the Pamban sea bridge.', ph: 'Ramanathaswamy corridor / Pamban bridge' },
+        { key: 'kanyakumari', name: 'Kanyakumari', tag: 'Land\u2019s end', line: 'Sunrise where three seas meet, with the Vivekananda Rock offshore.', ph: 'Kanyakumari sunrise' },
+        { key: 'tiruchendur', name: 'Tiruchendur', tag: 'Shore temple', line: 'Lord Murugan\u2019s seaside abode on the Gulf of Mannar.', ph: 'Tiruchendur temple by the sea' },
+        { key: 'courtallam', name: 'Courtallam', tag: 'Waterfalls', line: 'The \u201cSpa of the South\u201d, its falls in full flow through the monsoon.', ph: 'Courtallam falls' },
+        { key: 'kodaikanal', name: 'Kodaikanal', tag: 'Hill station', line: 'A misty star-shaped lake and pine forests high in the Palani hills.', ph: 'Kodaikanal lake in mist' }
+      ],
+      kl: [
+        { key: 'munnar', name: 'Munnar', tag: 'Tea hills', line: 'Tea estates folding over the Western Ghats, cool air year-round.', ph: 'Munnar tea estates' },
+        { key: 'alleppey', name: 'Alleppey', tag: 'Backwaters', line: 'Slow houseboat days along palm-fringed canals and paddy fields.', ph: 'Alleppey houseboat' },
+        { key: 'thekkady', name: 'Thekkady', tag: 'Wild forest', line: 'Periyar\u2019s lake and forests, with spice gardens on every slope.', ph: 'Periyar lake / spice garden' },
+        { key: 'guruvayur', name: 'Guruvayur', tag: 'Temple town', line: 'Sri Krishna\u2019s temple — Kerala\u2019s most beloved place of worship.', ph: 'Guruvayur temple lamps' },
+        { key: 'trivandrum', name: 'Trivandrum', tag: 'Temple & coast', line: 'Sree Padmanabhaswamy Temple, then the shores of Kovalam.', ph: 'Padmanabhaswamy temple' }
+      ]
+    };
+    const fleet = [
+      { key: 'etios', name: 'Toyota Etios', cat: 'Sedan', f: 'sedan', seats: '4 + 1', bags: '2 large', best: 'Couples, small families', note: 'Smooth and fuel-efficient for long highway days between temple towns.', ph: 'Toyota Etios' },
+      { key: 'dzire', name: 'Maruti Dzire', cat: 'Sedan', f: 'sedan', seats: '4 + 1', bags: '2 large', best: 'Airport & city transfers', note: 'Compact and easy to park — good for city sightseeing and station pickups.', ph: 'Maruti Dzire' },
+      { key: 'crysta', name: 'Innova Crysta', cat: 'Premium MUV', f: 'suv', seats: '7 + 1', bags: '3 large', best: 'Family temple tours', note: 'The south\u2019s favourite tour car. Roomy captain seats and a smooth ride on ghat roads.', ph: 'Toyota Innova Crysta' },
+      { key: 'hycross', name: 'Innova Hycross', cat: 'Hybrid MUV', f: 'suv', seats: '7 + 1', bags: '3 large', best: 'Quiet long drives', note: 'A quiet, refined hybrid for travellers who want extra comfort on long journeys.', ph: 'Toyota Innova Hycross' },
+      { key: 'tempo', name: 'Tempo Traveller', cat: 'Group van', f: 'van', seats: '12 / 17', bags: 'Roof carrier', best: 'Group pilgrimages', note: 'Push-back seats and plenty of headroom for extended family and temple groups.', ph: 'Force Tempo Traveller' },
+      { key: 'urbania', name: 'Force Urbania', cat: 'Premium van', f: 'van', seats: '10 / 13 / 17', bags: 'Rear boot', best: 'Premium group tours', note: 'A modern premium van with individual seats, large windows and a quiet cabin.', ph: 'Force Urbania' }
+    ].map((v, i) => ({ ...v, n: String(i + 1).padStart(2, '0'), wa: this.wa(`Vanakkam! I'd like to enquire about the ${v.name} for a trip.`) }));
+    const packages = [
+      { days: '05', dur: 'Days · 4 Nights', title: 'Divine Tamil Nadu', route: 'Madurai → Rameswaram → Tiruchendur → Kanyakumari', hl: 'Meenakshi Amman darshan, Pamban bridge, shore temples and sunrise at land\u2019s end.' },
+      { days: '06', dur: 'Days · 5 Nights', title: 'Kerala Hills & Backwaters', route: 'Munnar → Thekkady → Alleppey', hl: 'Tea estates, a Periyar boat ride and a night on a houseboat.' },
+      { days: '04', dur: 'Days · 3 Nights', title: 'Southern Coast Pilgrimage', route: 'Trivandrum → Suchindram → Kanyakumari → Tiruchendur', hl: 'Padmanabhaswamy, Thanumalayan temple and the meeting of three seas.' },
+      { days: '04', dur: 'Days · 3 Nights', title: 'Kodai & Courtallam Retreat', route: 'Madurai → Kodaikanal → Courtallam', hl: 'Lake mornings, pine forests and bathing in the falls.' }
+    ].map(p => ({ ...p, wa: this.wa(`Vanakkam! I'm interested in the "${p.title}" package (${p.days} ${p.dur}).`) }));
+    const quotes = [
+      { q: 'Our driver timed every darshan for us and still found us the quietest beach at Kanyakumari. My parents keep talking about it.', who: 'Lakshmi R.', trip: 'Chennai · Divine Tamil Nadu' },
+      { q: 'Spotless Crysta, calm driving on the Munnar ghats and no rushing. It felt like travelling with family.', who: 'Arun & family', trip: 'Bengaluru · Kerala Hills & Backwaters' },
+      { q: 'We were seventeen of us in the Urbania and it went perfectly — the pickups, the temple queues, the food stops.', who: 'Meera N.', trip: 'Hyderabad · Group pilgrimage' }
+    ];
+    const tab = (label, active, onClick, dark) => ({ label, onClick, bg: active ? (dark ? '#d6b26a' : '#1b241e') : 'transparent', fg: active ? (dark ? '#0e1712' : '#f3ede0') : (dark ? '#e4ddcc' : '#1b241e') });
+    const ff = s.fleetFilter;
+    return {
+      rootRef: this.rootRef, overlayRef: this.overlayRef, progRef: this.progRef, heroParRef: this.heroParRef, heroImgRef: this.heroImgRef,
+      marqRef: this.marqRef, quoteRef: this.quoteRef, waRef: this.waRef, scrollCueRef: this.scrollCueRef,
+      showOverlay: !s.introDone,
+      enterWithMusic: () => this.enter(true), enterQuiet: () => this.enter(false),
+      navBg: s.scrolled || s.menuOpen ? 'rgba(14,23,18,.82)' : 'transparent',
+      navLine: s.scrolled ? 'rgba(214,178,106,.2)' : 'transparent',
+      navPad: s.scrolled ? '14px clamp(20px,5vw,72px)' : '26px clamp(20px,5vw,72px)',
+      wide: s.wide, narrow: !s.wide, menuOpen: s.menuOpen && !s.wide,
+      toggleMenu: () => this.setState(x => ({ menuOpen: !x.menuOpen })), closeMenu: () => this.setState({ menuOpen: false }),
+      menuLabel: s.menuOpen ? 'Close' : 'Menu',
+      navLinks: [['About', '#about'], ['Destinations', '#destinations'], ['Fleet', '#fleet'], ['Packages', '#packages'], ['Gallery', '#gallery'], ['Contact', '#contact']].map(([label, href]) => ({ label, href })),
+      audioLabel: s.playing ? 'Music on' : 'Music off',
+      toggleAudio: () => (s.playing ? this.stopAudio() : this.startAudio()),
+      waGeneral: this.wa('Vanakkam! I would like to plan a trip with Southern Heritage Tours & Travels.'),
+      particlesEl: React.createElement('canvas', { ref: this.canvasRef, style: { position: 'absolute', inset: 0, width: '100%', height: '100%' } }),
+      marquee: [...dests.tn, ...dests.kl, ...dests.tn, ...dests.kl].map(d => d.name),
+      pillars: [
+        { n: 'i.', t: 'Temple circuits', d: 'Darshan-timed routes across the great temples of the south.' },
+        { n: 'ii.', t: 'Hills & backwaters', d: 'Unhurried escapes to Munnar, Kodaikanal and Alleppey.' },
+        { n: 'iii.', t: 'Transfers', d: 'Airport and railway pickups, any hour of the day or night.' }
+      ],
+      regionTabs: [tab('Tamil Nadu', s.region === 'tn', () => this.setState({ region: 'tn' }), true), tab('Kerala', s.region === 'kl', () => this.setState({ region: 'kl' }), true)],
+      destList: dests[s.region],
+      fleetTabs: [['All', 'all'], ['Sedans', 'sedan'], ['MUVs', 'suv'], ['Vans', 'van']].map(([l, k]) => tab(l, ff === k, () => this.setState({ fleetFilter: k }), false)),
+      fleetList: fleet.filter(v => ff === 'all' || v.f === ff),
+      packages,
+      reasons: [
+        { n: '01', t: 'Drivers who know the temples', d: 'Darshan timings, dress codes, the right gate to enter by — our drivers know them all.' },
+        { n: '02', t: 'Clean, well-kept vehicles', d: 'Every car is cleaned before each trip and serviced on schedule.' },
+        { n: '03', t: 'Clear, upfront pricing', d: 'You get a full quote before you travel, with tolls and permits listed.' },
+        { n: '04', t: 'Here for you around the clock', d: 'One WhatsApp message reaches us at any hour, before or during your trip.' }
+      ],
+      quote: quotes[s.tIdx],
+      quoteDots: quotes.map((_, i) => ({ onClick: () => this.goQuote(i), w: i === s.tIdx ? '56px' : '24px', bg: i === s.tIdx ? '#d6b26a' : 'rgba(243,237,224,.3)' })),
+      gallery: [
+        { key: 1, ph: 'Gopuram at dusk', rs: 2, cs: 1 }, { key: 2, ph: 'Houseboat on backwaters', rs: 1, cs: 2 },
+        { key: 3, ph: 'Tea hills in mist', rs: 1, cs: 1 }, { key: 4, ph: 'Temple oil lamps', rs: 2, cs: 1 },
+        { key: 5, ph: 'Kanyakumari sunrise', rs: 1, cs: 1 }, { key: 6, ph: 'Courtallam falls', rs: 1, cs: 1 },
+        { key: 7, ph: 'Our fleet on a ghat road', rs: 1, cs: 2 }, { key: 8, ph: 'Jasmine & kolam', rs: 1, cs: 1 }
+      ],
+      form: s.form,
+      onField: e => { const { name, value } = e.target; this.setState(x => ({ form: { ...x.form, [name]: value } })); },
+      submitForm: e => {
+        e.preventDefault(); const f = s.form;
+        const lines = ['Vanakkam! New trip enquiry:', f.name && `Name: ${f.name}`, f.phone && `Phone: ${f.phone}`, f.pickup && `Pickup: ${f.pickup}`,
+          f.dest && `Destination: ${f.dest}`, f.vehicle && `Vehicle: ${f.vehicle}`, f.date && `Date: ${f.date}`, f.pax && `Travellers: ${f.pax}`].filter(Boolean);
+        window.open(this.wa(lines.join('\n')), '_blank');
+      },
+      destNames: [...dests.tn, ...dests.kl].map(d => d.name),
+      vehicleNames: fleet.map(v => v.name),
+      contacts: [
+        { k: 'Phone', v: '+91 98000 00000', href: 'tel:+919800000000' },
+        { k: 'WhatsApp', v: 'Chat with us', href: this.wa('Vanakkam!') },
+        { k: 'Email', v: 'hello@southernheritage.in', href: 'mailto:hello@southernheritage.in' },
+        { k: 'Office', v: 'Madurai, Tamil Nadu', href: '#contact' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>
